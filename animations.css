@@ -1,0 +1,874 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HOTFY  ·  ADVANCED MOTION UI  ·  animations.css
+   Sections:
+     01. @property  — Houdini custom properties for animated values
+     02. @keyframes — Full animation library
+     03. Sidebar    — Nav hover, logo shine, butterfly glow
+     04. Cards      — Hover float, glow, animated gradient border
+     05. Buttons    — Shine sweep, CTA pulse, spring press
+     06. Views      — Fade-in-up + staggered children entrance
+     07. Audio      — Play ring, EQ bars, breathing card
+     08. Banner     — Gradient headline, ambient deco
+     09. Polish     — Focus rings, toggles, toasts, micro-details
+═══════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────────
+   01. @PROPERTY  —  Houdini (Chrome 85+, Firefox 128+, Safari 16.4+)
+   Allows CSS to animate custom properties as typed values.
+───────────────────────────────────────────────────────────────── */
+@property --border-angle {
+    syntax:        '<angle>';
+    initial-value: 0deg;
+    inherits:      false;
+}
+@property --shimmer-pos {
+    syntax:        '<percentage>';
+    initial-value: -60%;
+    inherits:      false;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   02. @KEYFRAMES LIBRARY
+───────────────────────────────────────────────────────────────── */
+
+/* ── View entrance ── */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ── Card / element stagger ── */
+@keyframes staggerIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* ── Sidebar nav shimmer sweep ── */
+@keyframes navSweep {
+    from { left: -80%; opacity: 0.8; }
+    to   { left: 130%; opacity: 0;   }
+}
+
+/* ── Logo text shine ── */
+@keyframes logoShine {
+    0%, 72%, 100% { left: -100%; opacity: 0; }
+    78%            { left:  -5%; opacity: 1;  }
+    88%            { left: 115%; opacity: 0;  }
+}
+
+/* ── Butterfly breath ── */
+@keyframes butterflyBreath {
+    0%, 100% {
+        filter: drop-shadow(0 0 4px  rgba(255, 45, 120, 0.40));
+    }
+    50% {
+        filter: drop-shadow(0 0 14px rgba(255, 45, 120, 0.90))
+                drop-shadow(0 0 30px rgba(255, 45, 120, 0.40));
+    }
+}
+
+/* ── Card glow breath ── */
+@keyframes cardBreath {
+    0%, 100% {
+        box-shadow:
+            0  6px 24px rgba(255, 45, 120, 0.08),
+            0  0   0  1px rgba(255, 45, 120, 0.18);
+    }
+    50% {
+        box-shadow:
+            0  8px 36px rgba(255, 45, 120, 0.20),
+            0  0   0  1px rgba(255, 45, 120, 0.38);
+    }
+}
+
+/* ── "NEW" card pulse (separate from hover) ── */
+@keyframes newCardPulse {
+    0%, 100% {
+        box-shadow:
+            0 4px 16px rgba(255, 45, 120, 0.06),
+            0 0   0  1px rgba(255, 45, 120, 0.14);
+    }
+    50% {
+        box-shadow:
+            0 4px 30px rgba(255, 45, 120, 0.20),
+            0 0   0  1px rgba(255, 45, 120, 0.44);
+    }
+}
+
+/* ── Badge-new ping ring ── */
+@keyframes badgePing {
+    0%   { transform: scale(1);    opacity: 0.9; }
+    70%  { transform: scale(1.5);  opacity: 0;   }
+    100% { transform: scale(1.5);  opacity: 0;   }
+}
+
+/* ── Rotating conic-gradient border (@property) ── */
+@keyframes borderRotate {
+    to { --border-angle: 360deg; }
+}
+
+/* ── CTA button pulse ── */
+@keyframes ctaPulse {
+    0%, 100% {
+        box-shadow:
+            0 0   0  0   rgba(255, 45, 120, 0.55),
+            0 4px 18px    rgba(255, 45, 120, 0.35);
+    }
+    50% {
+        box-shadow:
+            0 0   0 14px rgba(255, 45, 120, 0.00),
+            0 4px 28px    rgba(255, 45, 120, 0.50);
+    }
+}
+
+/* ── Button shine sweep ── */
+@keyframes btnShine {
+    from { left: -80%; opacity: 1;   }
+    to   { left: 130%; opacity: 0.3; }
+}
+
+/* ── Play button ring pulse ── */
+@keyframes playRing {
+    0%  {
+        box-shadow:
+            0 0 0  0   rgba(255, 45, 120, 0.70),
+            0 0 14px    rgba(255, 45, 120, 0.40);
+    }
+    60% {
+        box-shadow:
+            0 0 0 12px rgba(255, 45, 120, 0.00),
+            0 0 22px    rgba(255, 45, 120, 0.20);
+    }
+    100% {
+        box-shadow:
+            0 0 0  0   rgba(255, 45, 120, 0.00),
+            0 0 14px    rgba(255, 45, 120, 0.40);
+    }
+}
+
+/* ── Equalizer bar variants — all have different timing + amplitude ── */
+@keyframes eq1 { 0%,100%{height:6px}  25%{height:24px} 60%{height:11px} 80%{height:20px} }
+@keyframes eq2 { 0%,100%{height:16px} 20%{height:8px}  50%{height:26px} 75%{height:12px} }
+@keyframes eq3 { 0%,100%{height:22px} 30%{height:10px} 55%{height:28px} 80%{height:14px} }
+@keyframes eq4 { 0%,100%{height:10px} 15%{height:26px} 45%{height:16px} 70%{height:22px} }
+@keyframes eq5 { 0%,100%{height:18px} 35%{height:8px}  60%{height:24px} 85%{height:6px}  }
+
+/* ── Gradient text shift ── */
+@keyframes textGradient {
+    0%   { background-position:   0% center; }
+    100% { background-position: 200% center; }
+}
+
+/* ── Stat number shimmer ── */
+@keyframes statGlow {
+    0%, 100% { opacity: 1;   text-shadow: none; }
+    50%       { opacity: 0.8; text-shadow: 0 0 22px rgba(255, 45, 120, 0.75); }
+}
+
+/* ── Decorative circle pulse ── */
+@keyframes decoFloat {
+    0%, 100% { transform: scale(1);    opacity: 0.55; }
+    50%       { transform: scale(1.12); opacity: 0.90; }
+}
+
+/* ── Ripple click ── */
+@keyframes rippleOut {
+    from { transform: scale(0);   opacity: 0.5; }
+    to   { transform: scale(2.8); opacity: 0;   }
+}
+
+/* ── Toast slide-in ── */
+@keyframes toastSlide {
+    from { opacity: 0; transform: translateX(110%) scale(0.94); }
+    to   { opacity: 1; transform: translateX(0)    scale(1);    }
+}
+
+/* ── Icon bounce ── */
+@keyframes iconBounce {
+    0%, 100% { transform: scale(1.2)  rotate(-8deg); }
+    50%       { transform: scale(1.28) rotate(-12deg) translateY(-2px); }
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   03. SIDEBAR — Logo, butterfly, nav hover
+───────────────────────────────────────────────────────────────── */
+
+/* Butterfly SVG — neon breath glow */
+.sidebar svg {
+    animation: butterflyBreath 3.2s ease-in-out infinite;
+    will-change: filter;
+}
+
+/* "Hotfy" h1 container — holds the shine ::after */
+.sidebar h1 {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+}
+.sidebar h1::after {
+    content:       '';
+    position:      absolute;
+    top:           -10%;
+    left:          -100%;
+    width:         55%;
+    height:        120%;
+    background:    linear-gradient(
+        90deg,
+        transparent            0%,
+        rgba(255,255,255,0.30) 50%,
+        transparent           100%
+    );
+    transform:     skewX(-16deg);
+    pointer-events: none;
+    animation:     logoShine 5.5s ease-in-out infinite;
+}
+
+/* Nav items — overflow needed for sweep ::after */
+.nav-item {
+    overflow: hidden;
+    will-change: transform;
+    transition:
+        color       0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        background  0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Shimmer sweep on hover (::after is free — ::before is used for active bar) */
+.nav-item::after {
+    content:        '';
+    position:       absolute;
+    top:            -10%;
+    left:           -80%;
+    width:          42%;
+    height:         120%;
+    background:     linear-gradient(
+        90deg,
+        transparent           0%,
+        rgba(255,255,255,0.06) 50%,
+        transparent           100%
+    );
+    transform:      skewX(-14deg);
+    pointer-events: none;
+    z-index:        0;
+}
+.nav-item:hover::after {
+    animation: navSweep 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Icon — spring bounce on hover */
+.nav-item i {
+    transition:
+        transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+        color     0.25s ease;
+    position:  relative;
+    z-index:   1;
+}
+.nav-item:hover i {
+    animation: iconBounce 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.nav-item.active i {
+    transform: scale(1.12);
+}
+
+/* Ensure text / badges render above the sweep */
+.nav-item span,
+.nav-item .badge-new,
+.nav-item .ml-auto {
+    position: relative;
+    z-index:  1;
+}
+
+/* Active bar — add a glow to the indicator */
+.nav-item.active::before {
+    box-shadow: 2px 0 10px rgba(255, 45, 120, 0.55);
+}
+
+/* Profile mini-card — hover lift */
+.sidebar .glass {
+    transition:
+        background   0.3s ease,
+        border-color 0.3s ease,
+        box-shadow   0.3s ease;
+}
+.sidebar .glass:hover {
+    background:   rgba(255, 45, 120, 0.07);
+    border-color: rgba(255, 45, 120, 0.25);
+    box-shadow:   0 4px 20px rgba(255, 45, 120, 0.10);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   04. CARDS — Hover float, glow, badge border, dl-card
+───────────────────────────────────────────────────────────────── */
+
+/* Base card — enhanced spring transition */
+.card {
+    transition:
+        border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        transform    0.38s cubic-bezier(0.34, 1.15, 0.64, 1),
+        box-shadow   0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+}
+.card:hover {
+    transform:   translateY(-7px);
+    border-color: rgba(255, 45, 120, 0.38);
+    box-shadow:
+        0 18px 50px rgba(255, 45, 120, 0.20),
+        0  6px 18px rgba(255, 45, 120, 0.10),
+        inset 0 0 0 1px rgba(255, 45, 120, 0.24);
+}
+
+/* Stop animation on hover so hover shadow takes full control */
+.card:hover {
+    animation-play-state: paused;
+}
+
+/* Thumbnail overlay — zoom on hover */
+.card .relative.h-32 > .absolute.inset-0,
+.card .relative.h-28 > .absolute.inset-0 {
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card:hover .relative.h-32 > .absolute.inset-0,
+.card:hover .relative.h-28 > .absolute.inset-0 {
+    transform: scale(1.07);
+}
+
+/* Thumbnail icon — extra pop on card hover */
+.card-icon {
+    transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+.card:hover .card-icon {
+    transform: scale(1.18) !important;
+}
+
+/* ── "NOVO" cards — breathing border glow ── */
+.card:has(.badge-new) {
+    animation: newCardPulse 3.5s ease-in-out infinite;
+}
+
+/* ── "NOVO" badge — ping halo ── */
+.badge-new {
+    position: relative;
+    isolation: isolate;
+}
+.badge-new::before {
+    content:        '';
+    position:       absolute;
+    inset:          0;
+    border-radius:  999px;
+    background:     rgba(255, 45, 120, 0.55);
+    animation:      badgePing 2.2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    pointer-events: none;
+    z-index:        -1;
+}
+
+/* ── ADVANCED: .card-featured — rotating conic-gradient border ──
+   Usage: add class="card-featured" to any card for the extra effect.
+   Requires @property support (Chrome 85+, Firefox 128+, Safari 16.4+).
+   Falls back gracefully to a static pink border in older browsers.    */
+.card-featured {
+    border: 1.5px solid transparent;
+    background:
+        linear-gradient(var(--bg3), var(--bg3)) padding-box,
+        conic-gradient(from var(--border-angle),
+            rgba(255,  45, 120, 0.00)   0%,
+            rgba(255,  45, 120, 0.80)  20%,
+            rgba(255, 160, 195, 1.00)  38%,
+            rgba(255,  45, 120, 0.80)  55%,
+            rgba(255,  45, 120, 0.00)  75%,
+            rgba(255,  45, 120, 0.00) 100%
+        ) border-box;
+    animation: borderRotate 3.5s linear infinite;
+}
+/* Fallback for browsers without @property */
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
+    .card-featured {
+        border-color: rgba(255, 45, 120, 0.45);
+        animation:    newCardPulse 3s ease-in-out infinite;
+    }
+}
+
+/* ── Download cards ── */
+.dl-card {
+    transition:
+        border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+        transform    0.38s cubic-bezier(0.34, 1.15, 0.64, 1),
+        box-shadow   0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+.dl-card:hover {
+    transform:   translateY(-7px);
+    border-color: rgba(255, 45, 120, 0.32);
+    box-shadow:
+        0 16px 44px rgba(255, 45, 120, 0.17),
+        0  4px 14px rgba(255, 45, 120, 0.09);
+}
+.dl-card:hover .dl-icon {
+    transform: scale(1.22) rotate(-8deg) !important;
+}
+
+/* ── Continue card ── */
+.continue-card {
+    animation: cardBreath 4.5s ease-in-out infinite;
+    transition:
+        background 0.35s ease,
+        transform  0.38s cubic-bezier(0.34, 1.15, 0.64, 1),
+        box-shadow 0.35s ease;
+}
+.continue-card:hover {
+    animation-play-state: paused;
+    transform:  translateY(-5px);
+    box-shadow: 0 14px 42px rgba(255, 45, 120, 0.26);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   05. BUTTONS — Shine sweep, CTA pulse, spring press, ripple
+───────────────────────────────────────────────────────────────── */
+
+/* .btn-pink — shine container */
+.btn-pink {
+    position:  relative;
+    overflow:  hidden;
+    transition:
+        background  0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow  0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        transform   0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+    will-change: transform;
+}
+
+/* Shine ::before — sweeps left→right on hover */
+.btn-pink::before {
+    content:        '';
+    position:       absolute;
+    top:            0;
+    left:           -80%;
+    width:          50%;
+    height:         100%;
+    background:     linear-gradient(
+        90deg,
+        transparent           0%,
+        rgba(255,255,255,0.28) 50%,
+        transparent           100%
+    );
+    transform:      skewX(-20deg);
+    pointer-events: none;
+    z-index:        1;
+}
+.btn-pink:hover::before {
+    animation: btnShine 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Hover elevation */
+.btn-pink:hover {
+    transform:  translateY(-2px);
+    box-shadow:
+        0  8px 26px rgba(255, 45, 120, 0.50),
+        0  2px  8px rgba(255, 45, 120, 0.28);
+}
+
+/* Press/active spring */
+.btn-pink:active {
+    transform:        translateY(0) scale(0.96);
+    transition-duration: 0.09s;
+    box-shadow: 0 2px 8px rgba(255, 45, 120, 0.30);
+}
+
+/* Main CTA — pulse (replaces the simple .pulse animation) */
+#cta-learn,
+.btn-pink.pulse {
+    animation: ctaPulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+}
+#cta-learn:hover,
+.btn-pink.pulse:hover {
+    animation-play-state: paused !important;
+}
+
+/* Ghost button — spring */
+.btn-ghost {
+    position: relative;
+    overflow: hidden;
+    transition:
+        background   0.25s ease,
+        color        0.25s ease,
+        border-color 0.25s ease,
+        transform    0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.btn-ghost:hover {
+    transform:    translateY(-2px);
+    border-color: rgba(255, 45, 120, 0.38);
+}
+.btn-ghost:active {
+    transform: translateY(0) scale(0.96);
+    transition-duration: 0.09s;
+}
+
+/* Play button — spring + ring animation when active */
+.play-btn {
+    transition:
+        background  0.2s ease,
+        transform   0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow  0.2s ease;
+    will-change: transform;
+}
+.play-btn:hover  { transform: scale(1.12); }
+.play-btn:active {
+    transform: scale(0.92);
+    transition-duration: 0.08s;
+}
+
+/* Ripple element (spawned by JS) */
+.ripple-wave {
+    position:         absolute;
+    border-radius:    50%;
+    background:       rgba(255, 255, 255, 0.28);
+    pointer-events:   none;
+    transform-origin: center;
+    animation:        rippleOut 0.65s ease-out forwards;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   06. VIEW TRANSITIONS — Entrance + staggered grid
+───────────────────────────────────────────────────────────────── */
+
+/* View container entrance */
+.view.active {
+    animation: fadeInUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Direct children of each view — staggered upward entrance */
+.view.active > * {
+    animation:      staggerIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-fill-mode: both;
+}
+.view.active > *:nth-child(1) { animation-delay: 0.00s; }
+.view.active > *:nth-child(2) { animation-delay: 0.07s; }
+.view.active > *:nth-child(3) { animation-delay: 0.14s; }
+.view.active > *:nth-child(4) { animation-delay: 0.21s; }
+.view.active > *:nth-child(5) { animation-delay: 0.28s; }
+.view.active > *:nth-child(6) { animation-delay: 0.35s; }
+
+/* Grid items — lighter stagger */
+.view.active .grid > * {
+    animation:           staggerIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-fill-mode: both;
+}
+.view.active .grid > *:nth-child(1) { animation-delay: 0.04s; }
+.view.active .grid > *:nth-child(2) { animation-delay: 0.10s; }
+.view.active .grid > *:nth-child(3) { animation-delay: 0.16s; }
+.view.active .grid > *:nth-child(4) { animation-delay: 0.22s; }
+.view.active .grid > *:nth-child(5) { animation-delay: 0.28s; }
+.view.active .grid > *:nth-child(6) { animation-delay: 0.34s; }
+.view.active .grid > *:nth-child(7) { animation-delay: 0.40s; }
+.view.active .grid > *:nth-child(8) { animation-delay: 0.46s; }
+
+/* Audio card wraps */
+.view.active .audio-card-wrap {
+    animation:           staggerIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-fill-mode: both;
+}
+.view.active .audio-card-wrap:nth-child(1) { animation-delay: 0.04s; }
+.view.active .audio-card-wrap:nth-child(2) { animation-delay: 0.10s; }
+.view.active .audio-card-wrap:nth-child(3) { animation-delay: 0.16s; }
+.view.active .audio-card-wrap:nth-child(4) { animation-delay: 0.22s; }
+.view.active .audio-card-wrap:nth-child(5) { animation-delay: 0.28s; }
+.view.active .audio-card-wrap:nth-child(6) { animation-delay: 0.34s; }
+
+/* FAQ items stagger */
+.view.active .faq-item {
+    animation:           staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-fill-mode: both;
+}
+.view.active .faq-item:nth-child(1) { animation-delay: 0.08s; }
+.view.active .faq-item:nth-child(2) { animation-delay: 0.15s; }
+.view.active .faq-item:nth-child(3) { animation-delay: 0.22s; }
+.view.active .faq-item:nth-child(4) { animation-delay: 0.29s; }
+.view.active .faq-item:nth-child(5) { animation-delay: 0.36s; }
+
+
+/* ─────────────────────────────────────────────────────────────────
+   07. AUDIO PLAYER — Ring pulse, EQ bars, breathing border
+───────────────────────────────────────────────────────────────── */
+
+/* ── is-playing card — breathing glow border ── */
+.audio-card.is-playing {
+    border-color: rgba(255, 45, 120, 0.50) !important;
+    box-shadow:
+        0  6px 28px rgba(255, 45, 120, 0.22),
+        inset 0 0 0 1px rgba(255, 45, 120, 0.38) !important;
+    animation: cardBreath 2.8s ease-in-out infinite !important;
+}
+.audio-card.is-playing:hover {
+    animation-play-state: paused !important;
+    transform:   translateY(-7px);
+    box-shadow:
+        0 20px 55px rgba(255, 45, 120, 0.30),
+        inset 0 0 0 1px rgba(255, 45, 120, 0.45) !important;
+}
+
+/* ── Play button — ring pulse while playing ── */
+.audio-card.is-playing .play-btn {
+    animation: playRing 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    will-change: box-shadow;
+}
+
+/* ── Range track glows when playing ── */
+.audio-card.is-playing .range {
+    filter: drop-shadow(0 0 4px rgba(255, 45, 120, 0.55));
+    transition: filter 0.4s ease;
+}
+
+/* ── Wave-static bars — bright when playing ── */
+.audio-card.is-playing .wave-static span {
+    background: rgba(255, 45, 120, 0.80) !important;
+    /* Individual EQ keyframes (eq1–eq5) override the generic 'wave' keyframe */
+}
+
+/* EQ bars — different keyframe + duration per bar for organic feel */
+.audio-card.is-playing .wave-static span:nth-child(1)  { animation: eq1 0.72s ease-in-out infinite;        }
+.audio-card.is-playing .wave-static span:nth-child(2)  { animation: eq2 0.60s ease-in-out infinite 0.06s;  }
+.audio-card.is-playing .wave-static span:nth-child(3)  { animation: eq3 0.84s ease-in-out infinite 0.12s;  }
+.audio-card.is-playing .wave-static span:nth-child(4)  { animation: eq4 0.65s ease-in-out infinite 0.03s;  }
+.audio-card.is-playing .wave-static span:nth-child(5)  { animation: eq1 0.78s ease-in-out infinite 0.18s;  }
+.audio-card.is-playing .wave-static span:nth-child(6)  { animation: eq5 0.56s ease-in-out infinite 0.09s;  }
+.audio-card.is-playing .wave-static span:nth-child(7)  { animation: eq2 0.70s ease-in-out infinite 0.22s;  }
+.audio-card.is-playing .wave-static span:nth-child(8)  { animation: eq3 0.62s ease-in-out infinite 0.15s;  }
+.audio-card.is-playing .wave-static span:nth-child(9)  { animation: eq4 0.80s ease-in-out infinite 0.07s;  }
+.audio-card.is-playing .wave-static span:nth-child(10) { animation: eq5 0.68s ease-in-out infinite 0.20s;  }
+.audio-card.is-playing .wave-static span:nth-child(11) { animation: eq1 0.74s ease-in-out infinite 0.11s;  }
+.audio-card.is-playing .wave-static span:nth-child(12) { animation: eq2 0.58s ease-in-out infinite 0.17s;  }
+.audio-card.is-playing .wave-static span:nth-child(13) { animation: eq3 0.66s ease-in-out infinite 0.04s;  }
+.audio-card.is-playing .wave-static span:nth-child(14) { animation: eq4 0.76s ease-in-out infinite 0.24s;  }
+.audio-card.is-playing .wave-static span:nth-child(15) { animation: eq5 0.64s ease-in-out infinite 0.13s;  }
+
+
+/* ─────────────────────────────────────────────────────────────────
+   08. WELCOME BANNER — Gradient headline, stats, deco circles
+───────────────────────────────────────────────────────────────── */
+
+/* Animated gradient headline */
+.welcome-banner h2 {
+    background: linear-gradient(
+        135deg,
+        #ffffff  0%,
+        #ffffff 45%,
+        #FF7AAC 62%,
+        #FF2D78 70%,
+        #ffffff 82%,
+        #ffffff 100%
+    );
+    background-size:            220% auto;
+    -webkit-background-clip:    text;
+    -webkit-text-fill-color:    transparent;
+    background-clip:            text;
+    animation:                  textGradient 7s linear infinite;
+    will-change:                background-position;
+}
+
+/* Stats in glass-pink panels */
+.glass-pink .text-3xl {
+    animation: statGlow 3.5s ease-in-out infinite;
+}
+
+/* Decorative rings — slow float */
+.welcome-banner .absolute.rounded-full:last-child {
+    animation: decoFloat 7s ease-in-out infinite;
+}
+.welcome-banner .absolute.rounded-full:nth-last-child(2) {
+    animation: decoFloat 9s ease-in-out infinite 1.5s;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────
+   09. GLOBAL POLISH — Focus, toggles, toasts, avatar, misc
+───────────────────────────────────────────────────────────────── */
+
+/* Text rendering */
+html { scroll-behavior: smooth; }
+body {
+    -webkit-font-smoothing:  antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering:          optimizeLegibility;
+}
+
+/* On-brand focus ring */
+:focus-visible {
+    outline:        2px solid rgba(255, 45, 120, 0.70);
+    outline-offset: 2px;
+    border-radius:  8px;
+}
+
+/* Form inputs — smooth glow on focus */
+.form-input {
+    transition:
+        border-color 0.22s ease,
+        background   0.22s ease,
+        box-shadow   0.28s ease !important;
+}
+
+/* FAQ icon — spring rotation (supplements inline JS) */
+.faq-icon {
+    transition: transform 0.4s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
+}
+.faq-item.open .faq-trigger {
+    color: #fff;
+}
+.faq-item {
+    transition:
+        border-color 0.3s ease,
+        box-shadow   0.3s ease;
+}
+.faq-item.open {
+    box-shadow: 0 4px 20px rgba(255, 45, 120, 0.10);
+}
+
+/* Toggle switch — spring thumb */
+.toggle-slider::before {
+    transition:
+        transform  0.38s cubic-bezier(0.34, 1.4, 0.64, 1),
+        background 0.25s ease !important;
+}
+.toggle-wrap {
+    transition:
+        border-color 0.3s ease,
+        background   0.3s ease,
+        box-shadow   0.3s ease;
+}
+.toggle-wrap:has(input:checked) {
+    border-color: rgba(255, 45, 120, 0.28);
+    box-shadow:   0 2px 12px rgba(255, 45, 120, 0.08);
+}
+
+/* Avatar ring — hover glow + scale */
+.avatar-ring {
+    transition:
+        box-shadow 0.32s ease,
+        transform  0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+    cursor: pointer;
+}
+.avatar-ring:hover {
+    box-shadow: 0 0 0 4px rgba(255, 45, 120, 0.25), 0 0 22px rgba(255, 45, 120, 0.22);
+    transform:  scale(1.06);
+}
+
+/* Filter buttons — spring hover */
+.filter-btn {
+    transition:
+        color        0.25s ease,
+        border-color 0.25s ease,
+        background   0.25s ease,
+        transform    0.25s cubic-bezier(0.34, 1.4, 0.64, 1) !important;
+}
+.filter-btn:hover:not(.active) {
+    transform:    translateY(-2px) !important;
+    border-color: rgba(255, 45, 120, 0.28) !important;
+    color:        rgba(255, 255, 255, 0.80) !important;
+}
+.filter-btn:active {
+    transform: scale(0.95) translateY(0) !important;
+    transition-duration: 0.09s !important;
+}
+
+/* Toasts — enhanced entrance */
+.toast.show {
+    animation: toastSlide 0.42s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+/* Notif dot — stronger shadow */
+.notif-dot {
+    box-shadow: 0 0 8px rgba(255, 45, 120, 0.65);
+}
+
+/* Download/action icon transitions */
+.dl-icon {
+    transition:
+        color     0.30s ease,
+        transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Range input — smooth thumb on all sliders */
+.range,
+.vol-range {
+    transition: filter 0.3s ease;
+}
+.range:hover, .vol-range:hover {
+    filter: drop-shadow(0 0 3px rgba(255, 45, 120, 0.40));
+}
+
+/* Glass panels — subtle hover lift */
+.glass {
+    transition:
+        background   0.3s ease,
+        border-color 0.3s ease,
+        box-shadow   0.3s ease;
+}
+
+/* Scroll bar thumb hover */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 45, 120, 0.8);
+}
+
+/* Logout button — spring scale */
+#btn-logout {
+    transition:
+        background  0.25s ease,
+        color       0.25s ease,
+        transform   0.25s cubic-bezier(0.34, 1.4, 0.64, 1),
+        box-shadow  0.25s ease !important;
+}
+#btn-logout:hover {
+    transform: translateY(-1px) !important;
+}
+#btn-logout:active {
+    transform: scale(0.97) !important;
+    transition-duration: 0.08s !important;
+}
+
+/* Support form submit — loading state keeps layout */
+#support-form button[type="submit"] {
+    transition:
+        background    0.25s ease,
+        box-shadow    0.28s ease,
+        transform     0.22s cubic-bezier(0.34, 1.4, 0.64, 1),
+        opacity       0.2s ease;
+}
+#support-form button[type="submit"]:disabled {
+    opacity:  0.72;
+    cursor:   wait;
+    transform: none !important;
+}
+
+/* Profile save / password save buttons */
+#save-password:disabled {
+    opacity: 0.72;
+    cursor:  wait;
+}
+
+/* Tag pills — spring hover */
+.tag {
+    transition:
+        background   0.22s ease,
+        border-color 0.22s ease,
+        transform    0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+    cursor: default;
+}
+.tag:hover {
+    background:   rgba(255, 45, 120, 0.20);
+    border-color: rgba(255, 45, 120, 0.40);
+    transform:    translateY(-1px);
+}
+
+/* ─── Performance: hint GPU layers for frequently-animated elements ─── */
+.card,
+.dl-card,
+.play-btn,
+.btn-pink,
+.nav-item,
+.sidebar svg,
+.audio-card.is-playing {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}

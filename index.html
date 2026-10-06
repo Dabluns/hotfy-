@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotfy — Área de Membros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ── Design Tokens ── */
+        :root {
+            --pink:       #FF2D78;
+            --pink-dim:   rgba(255,45,120,0.4);
+            --pink-faint: rgba(255,45,120,0.1);
+            --bg:         #09090B;
+            --bg2:        #111116;
+            --bg3:        #18181f;
+            --bg4:        #222229;
+            --border:     rgba(255,255,255,0.07);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg2); }
+        ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 999px; }
+
+        /* ── Glass ── */
+        .glass      { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); }
+        .glass-pink { background: rgba(255,45,120,0.07);  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,45,120,0.18); }
+
+        /* ── Glow ── */
+        .glow-pink { box-shadow: 0 0 18px var(--pink-dim), 0 0 40px rgba(255,45,120,0.15); }
+        .text-glow  { text-shadow: 0 0 18px rgba(255,45,120,0.65); }
+
+        /* ── SPA Views ── */
+        .view { display: none; }
+        .view.active { display: block; animation: viewIn .3s ease forwards; }
+        @keyframes viewIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 252px; height: 100vh;
+            position: fixed; left: 0; top: 0;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            z-index: 50;
+            display: flex; flex-direction: column;
+            transition: transform .3s cubic-bezier(.4,0,.2,1);
+            overflow-y: auto;
+        }
+
+        /* ── Nav items ── */
+        .nav-item {
+            display: flex; align-items: center; gap: 11px;
+            padding: 10px 14px; border-radius: 12px;
+            color: rgba(255,255,255,.45);
+            cursor: pointer; transition: all .2s;
+            text-decoration: none; font-size: 13.5px; font-weight: 500;
+            position: relative;
+        }
+        .nav-item:hover  { color: #fff; background: rgba(255,45,120,.09); }
+        .nav-item.active { color: #fff; background: rgba(255,45,120,.14); }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+            width: 3px; background: var(--pink); border-radius: 0 4px 4px 0;
+        }
+        .nav-item.active i { color: var(--pink); }
+        .nav-item i { width: 18px; font-size: 15px; }
+
+        /* ── Main ── */
+        .main-content { margin-left: 252px; min-height: 100vh; padding: 28px 28px 40px; transition: margin-left .3s; }
+
+        /* ── Cards ── */
+        .card { background: var(--bg3); border: 1px solid var(--border); border-radius: 18px; transition: border-color .3s, transform .3s, box-shadow .3s; overflow: hidden; }
+        .card:hover { border-color: rgba(255,45,120,.32); transform: translateY(-4px); box-shadow: 0 10px 32px rgba(255,45,120,.14); }
+        .card:hover .card-icon { transform: scale(1.08); }
+        .card-icon { transition: transform .3s; }
+
+        /* ── Audio Card ── */
+        .audio-card.is-playing { border-color: rgba(255,45,120,.38) !important; box-shadow: 0 4px 26px rgba(255,45,120,.18) !important; }
+        .audio-card.is-playing .wave-static span { animation: wave 1.2s ease-in-out infinite; }
+        .audio-card.is-playing .wave-static span:nth-child(2)  { animation-delay:.08s; }
+        .audio-card.is-playing .wave-static span:nth-child(3)  { animation-delay:.16s; }
+        .audio-card.is-playing .wave-static span:nth-child(4)  { animation-delay:.24s; }
+        .audio-card.is-playing .wave-static span:nth-child(5)  { animation-delay:.16s; }
+        .audio-card.is-playing .wave-static span:nth-child(6)  { animation-delay:.08s; }
+        .audio-card.is-playing .wave-static span:nth-child(7)  { animation-delay:.0s; }
+        .audio-card.is-playing .wave-static span:nth-child(8)  { animation-delay:.12s; }
+        .audio-card.is-playing .wave-static span:nth-child(9)  { animation-delay:.2s; }
+        .audio-card.is-playing .wave-static span:nth-child(10) { animation-delay:.28s; }
+        .audio-card.is-playing .wave-static span:nth-child(11) { animation-delay:.2s; }
+        .audio-card.is-playing .wave-static span:nth-child(12) { animation-delay:.12s; }
+        .audio-card.is-playing .wave-static span:nth-child(13) { animation-delay:.04s; }
+        .audio-card.is-playing .wave-static span:nth-child(14) { animation-delay:.18s; }
+        .audio-card.is-playing .wave-static span:nth-child(15) { animation-delay:.1s; }
+
+        /* ── Buttons ── */
+        .btn-pink  { background: var(--pink); color: #fff; border: none; border-radius: 12px; padding: 10px 20px; font-family: 'Poppins',sans-serif; font-weight: 600; font-size: 13.5px; cursor: pointer; transition: background .2s, box-shadow .2s, transform .15s; }
+        .btn-pink:hover  { background: #e8005f; box-shadow: 0 4px 22px var(--pink-dim); transform: translateY(-1px); }
+        .btn-ghost { background: rgba(255,255,255,.06); color: rgba(255,255,255,.8); border: 1px solid var(--border); border-radius: 12px; padding: 10px 18px; font-family: 'Poppins',sans-serif; font-weight: 500; font-size: 13px; cursor: pointer; transition: background .2s, color .2s; }
+        .btn-ghost:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+        /* ── Play button ── */
+        .play-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--pink); border: none; color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s, box-shadow .2s, transform .15s; flex-shrink: 0; }
+        .play-btn:hover { background: #e8005f; box-shadow: 0 0 22px var(--pink-dim); transform: scale(1.06); }
+        .play-btn.sm { width: 34px; height: 34px; font-size: 12px; }
+
+        /* ── Range inputs ── */
+        .range { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; border-radius: 999px; background: rgba(255,255,255,.12); outline: none; cursor: pointer; }
+        .range::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--pink); cursor: pointer; box-shadow: 0 0 8px var(--pink-dim); }
+        .range::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--pink); cursor: pointer; border: none; }
+        .vol-range { -webkit-appearance: none; appearance: none; width: 72px; height: 3px; border-radius: 999px; background: rgba(255,255,255,.12); outline: none; cursor: pointer; }
+        .vol-range::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--pink); }
+
+        /* ── Welcome banner ── */
+        .welcome-banner { background: linear-gradient(135deg,#1a0711 0%,#2c0b1d 55%,#180913 100%); border: 1px solid rgba(255,45,120,.22); border-radius: 22px; position: relative; overflow: hidden; }
+        .welcome-banner::before { content:''; position:absolute; top:-60%; right:-15%; width:420px; height:420px; background:radial-gradient(circle,rgba(255,45,120,.18) 0%,transparent 68%); pointer-events:none; }
+        .welcome-banner::after  { content:''; position:absolute; bottom:-40%; left:-10%; width:280px; height:280px; background:radial-gradient(circle,rgba(255,45,120,.09) 0%,transparent 70%); pointer-events:none; }
+
+        /* ── Continue card ── */
+        .continue-card { background: linear-gradient(135deg,rgba(255,45,120,.1),rgba(255,45,120,.04)); border: 1px solid rgba(255,45,120,.24); border-radius: 18px; padding: 20px; cursor: pointer; transition: background .3s, box-shadow .3s, transform .3s; }
+        .continue-card:hover { background: linear-gradient(135deg,rgba(255,45,120,.17),rgba(255,45,120,.07)); box-shadow: 0 8px 32px rgba(255,45,120,.18); transform: translateY(-2px); }
+
+        /* ── Download card ── */
+        .dl-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 18px; padding: 20px; transition: border-color .3s, transform .3s, box-shadow .3s; }
+        .dl-card:hover { border-color: rgba(255,45,120,.3); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(255,45,120,.12); }
+        .dl-card:hover .dl-icon { color: var(--pink) !important; transform: scale(1.12); }
+        .dl-icon { transition: color .3s, transform .3s; }
+
+        /* ── Tags & badges ── */
+        .tag { background: rgba(255,45,120,.11); color: rgba(255,100,150,.9); border: 1px solid rgba(255,45,120,.22); border-radius: 999px; padding: 3px 10px; font-size: 11px; font-weight: 500; }
+        .badge-new { background: var(--pink); color: #fff; border-radius: 999px; padding: 2px 9px; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+        .avatar-ring { padding: 2px; background: linear-gradient(135deg,var(--pink),#ff7aac); border-radius: 50%; }
+
+        /* ── Search input ── */
+        .search-input { background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 12px; padding: 9px 14px 9px 40px; color: #fff; font-family: 'Poppins',sans-serif; font-size: 13px; outline: none; width: 100%; transition: border-color .2s, background .2s, box-shadow .2s; }
+        .search-input:focus { border-color: rgba(255,45,120,.5); background: rgba(255,45,120,.05); box-shadow: 0 0 0 3px rgba(255,45,120,.1); }
+        .search-input::placeholder { color: rgba(255,255,255,.28); }
+
+        /* ── Form inputs ── */
+        .form-input { background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; color: #fff; font-family: 'Poppins',sans-serif; font-size: 14px; outline: none; width: 100%; transition: border-color .2s, background .2s, box-shadow .2s; resize: none; }
+        .form-input:focus { border-color: rgba(255,45,120,.5); background: rgba(255,45,120,.04); box-shadow: 0 0 0 3px rgba(255,45,120,.1); }
+        .form-input::placeholder { color: rgba(255,255,255,.28); }
+        .form-label { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.5); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .6px; }
+
+        /* ── FAQ ── */
+        .faq-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color .3s; }
+        .faq-item.open { border-color: rgba(255,45,120,.3); }
+        .faq-trigger { width: 100%; background: none; border: none; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; text-align: left; font-family: 'Poppins',sans-serif; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.85); transition: color .2s; }
+        .faq-trigger:hover, .faq-item.open .faq-trigger { color: #fff; }
+        .faq-icon { color: rgba(255,45,120,.8); font-size: 18px; flex-shrink: 0; transition: transform .3s; }
+        .faq-body { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .faq-body-inner { padding: 0 20px 18px; font-size: 13.5px; line-height: 1.75; color: rgba(255,255,255,.5); border-top: 1px solid var(--border); padding-top: 14px; margin-top: 1px; }
+
+        /* ── Toggle switch ── */
+        .toggle-wrap { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; transition: border-color .3s; }
+        .toggle-wrap:hover { border-color: rgba(255,45,120,.2); }
+        .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+        .toggle-switch input { display: none; }
+        .toggle-slider { position: absolute; inset: 0; background: rgba(255,255,255,.12); border-radius: 999px; cursor: pointer; transition: background .3s; }
+        .toggle-slider::before { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: rgba(255,255,255,.6); transition: transform .3s, background .3s; }
+        .toggle-switch input:checked + .toggle-slider { background: var(--pink); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background: #fff; }
+
+        /* ── Password collapse ── */
+        #password-section { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+
+        /* ── Animations ── */
+        @keyframes pulse-pink { 0%,100% { box-shadow: 0 0 10px rgba(255,45,120,.35); } 50% { box-shadow: 0 0 26px rgba(255,45,120,.7); } }
+        .pulse { animation: pulse-pink 2s ease-in-out infinite; }
+        @keyframes wave { 0%,100% { height: 8px; opacity: .55; } 50% { height: 22px; opacity: 1; } }
+        .wave-bar { display: inline-block; width: 3px; background: var(--pink); border-radius: 3px; animation: wave 1.2s ease-in-out infinite; }
+        .wave-bar:nth-child(1){animation-delay:0s} .wave-bar:nth-child(2){animation-delay:.1s}
+        .wave-bar:nth-child(3){animation-delay:.2s} .wave-bar:nth-child(4){animation-delay:.3s}
+        .wave-bar:nth-child(5){animation-delay:.2s} .wave-bar:nth-child(6){animation-delay:.1s}
+        .wave-bar:nth-child(7){animation-delay:0s}  .wave-bar:nth-child(8){animation-delay:.15s}
+        .wave-bar:nth-child(9){animation-delay:.25s} .wave-bar:nth-child(10){animation-delay:.1s}
+        .notif-dot { width: 8px; height: 8px; background: var(--pink); border-radius: 50%; display: inline-block; animation: pulse-pink 2s infinite; }
+        .wave-static { display: flex; align-items: flex-end; gap: 2px; height: 28px; }
+        .wave-static span { width: 3px; background: rgba(255,45,120,.3); border-radius: 3px; transition: background .3s; }
+        .card:hover .wave-static span { background: rgba(255,45,120,.55); }
+        .divider { height: 1px; background: linear-gradient(90deg,rgba(255,45,120,.35),transparent); margin: 6px 0 10px; }
+
+        /* ── Toast ── */
+        #toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: var(--bg3); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; min-width: 260px; max-width: 340px; pointer-events: all; opacity: 0; transform: translateX(110%); transition: opacity .35s, transform .35s cubic-bezier(.4,0,.2,1); }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.hide { opacity: 0; transform: translateX(110%); }
+        .toast-success { border-left: 3px solid #22c55e; } .toast-success i.t-icon { color: #22c55e; }
+        .toast-download { border-left: 3px solid var(--pink); } .toast-download i.t-icon { color: var(--pink); }
+        .toast-info    { border-left: 3px solid #3b82f6; } .toast-info i.t-icon { color: #3b82f6; }
+        .toast-warning { border-left: 3px solid #eab308; } .toast-warning i.t-icon { color: #eab308; }
+        .toast span { flex: 1; font-size: 13px; color: rgba(255,255,255,.88); }
+        .toast-close { background: none; border: none; color: rgba(255,255,255,.3); cursor: pointer; font-size: 12px; padding: 0; transition: color .2s; }
+        .toast-close:hover { color: #fff; }
+
+        /* ── Pack Card ── */
+        .pack-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; transition: border-color .3s, transform .3s, box-shadow .3s; }
+        .pack-card:hover { border-color: rgba(255,45,120,.35); transform: translateY(-5px); box-shadow: 0 14px 40px rgba(255,45,120,.16); }
+        .pack-cover { height: 170px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .pack-cover-letter { font-size: 7rem; font-weight: 700; opacity: .08; color: #fff; line-height: 1; user-select: none; position: relative; z-index: 1; }
+        .pack-cover::after { content:''; position:absolute; bottom:0; left:0; right:0; height:60%; background: linear-gradient(to top, rgba(0,0,0,.65), transparent); z-index: 2; pointer-events:none; }
+        .pack-model-chip { position: absolute; bottom: 12px; left: 12px; z-index: 3; display: flex; align-items: center; gap: 7px; background: rgba(0,0,0,.55); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 4px 12px 4px 5px; }
+        .pack-model-avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+        .pack-count-chip { position: absolute; top: 12px; right: 12px; z-index: 3; background: rgba(0,0,0,.55); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 3px 10px; font-size: 11px; color: rgba(255,255,255,.75); }
+        .pack-filter-btn.active { color: var(--pink) !important; border-color: rgba(255,45,120,.45) !important; }
+
+        /* ── Pack Modal ── */
+        #pack-modal { position: fixed; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+        #pack-modal.open { opacity: 1; pointer-events: all; }
+        #pack-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); cursor: pointer; }
+        #pack-modal-box { position: relative; z-index: 1; background: var(--bg2); border: 1px solid rgba(255,45,120,.22); border-radius: 24px; width: 100%; max-width: 540px; max-height: 88vh; overflow-y: auto; }
+        #pack-modal-box::-webkit-scrollbar { width: 3px; }
+        #pack-modal-box::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 999px; }
+        .modal-close-btn { position: absolute; top: 14px; right: 14px; z-index: 10; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.7); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: background .2s, color .2s; }
+        .modal-close-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+        .preview-file-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; transition: background .2s; }
+        .preview-file-row:hover { background: rgba(255,255,255,.04); }
+        .preview-file-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+
+        /* ── Logo ── */
+        .logo-hot { color: #fff; } .logo-fy { color: var(--pink); }
+
+        /* ── Filter btn ── */
+        .filter-btn.active { color: var(--pink) !important; border-color: rgba(255,45,120,.45) !important; }
+
+        /* ── Overlay ── */
+        #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.72); z-index: 40; backdrop-filter: blur(4px); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            #overlay.active { display: block; }
+            .main-content { margin-left: 0; padding: 16px 16px 36px; }
+        }
+    </style>
+    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="sidebar-collapse.css">
+</head>
+<body>
+
+<!-- Overlay (mobile) -->
+<div id="overlay" onclick="toggleSidebar()"></div>
+
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+
+    <!-- Logo -->
+    <div class="p-5 border-b" style="border-color:var(--border)">
+        <div class="flex items-center gap-3 sidebar-logo-wrap">
+            <svg class="sidebar-butterfly flex-shrink-0" width="40" height="34" viewBox="0 0 40 34" fill="none">
+                <ellipse cx="10.5" cy="16" rx="9.5" ry="12" transform="rotate(-18 10.5 16)" fill="rgba(255,255,255,0.92)"/>
+                <ellipse cx="10.5" cy="16" rx="6"   ry="7.5" transform="rotate(-18 10.5 16)" fill="none" stroke="#FF2D78" stroke-width="1.4"/>
+                <ellipse cx="10.5" cy="17" rx="2.8" ry="4"   transform="rotate(-18 10.5 17)" fill="rgba(255,45,120,0.28)"/>
+                <ellipse cx="29.5" cy="16" rx="9.5" ry="12" transform="rotate(18 29.5 16)"  fill="rgba(255,255,255,0.92)"/>
+                <ellipse cx="29.5" cy="16" rx="6"   ry="7.5" transform="rotate(18 29.5 16)"  fill="none" stroke="#FF2D78" stroke-width="1.4"/>
+                <ellipse cx="29.5" cy="17" rx="2.8" ry="4"   transform="rotate(18 29.5 17)"  fill="rgba(255,45,120,0.28)"/>
+                <ellipse cx="20" cy="19" rx="2.6" ry="8.5" fill="#FF2D78"/>
+                <path d="M18.2 12 Q15 5.5 12.5 3.5" stroke="#FF2D78" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                <circle cx="12.5" cy="3.5" r="1.6" fill="#FF2D78"/>
+                <path d="M21.8 12 Q25 5.5 27.5 3.5" stroke="#FF2D78" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                <circle cx="27.5" cy="3.5" r="1.6" fill="#FF2D78"/>
+            </svg>
+            <div class="logo-text">
+                <h1 class="text-xl font-bold leading-none tracking-tight">
+                    <span class="logo-hot">Hot</span><span class="logo-fy text-glow">fy</span>
+                </h1>
+                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.35)">Área de Membros</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile mini -->
+    <div class="mx-4 mt-4">
+        <div class="glass rounded-2xl p-3.5 flex items-center gap-3 profile-card">
+            <div class="avatar-ring">
+                <div class="w-9 h-9 rounded-full bg-gradient-to-br from-pink-600 to-purple-800 flex items-center justify-center font-bold text-sm">A</div>
+            </div>
+            <div class="flex-1 min-w-0 profile-text">
+                <p class="text-sm font-semibold truncate">Ana Silveira</p>
+                <p class="text-xs" style="color:rgba(255,255,255,.38)">Membro Premium</p>
+            </div>
+            <span class="notif-dot"></span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-4 mt-5 space-y-0.5">
+        <p class="nav-section-label text-xs uppercase tracking-widest px-2 mb-2.5 font-medium" style="color:rgba(255,255,255,.28)">Menu</p>
+        <a class="nav-item active" data-view="dashboard" href="#">
+            <i class="fas fa-home"></i>
+            <span class="nav-text">Dashboard</span>
+            <span class="nav-tooltip">Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="audios" href="#">
+            <i class="fas fa-headphones"></i>
+            <span class="nav-text">Biblioteca de Áudios</span>
+            <span class="nav-badge ml-auto text-xs font-semibold px-2 py-0.5 rounded-full" style="background:var(--pink);color:#fff">12</span>
+            <span class="nav-tooltip">Áudios</span>
+        </a>
+        <a class="nav-item" data-view="materials" href="#">
+            <i class="fas fa-file-alt"></i>
+            <span class="nav-text">Materiais e Scripts</span>
+            <span class="nav-badge badge-new ml-auto">Novo</span>
+            <span class="nav-tooltip">Materiais</span>
+        </a>
+        <a class="nav-item" data-view="videos" href="#">
+            <i class="fas fa-film"></i>
+            <span class="nav-text">Vídeos</span>
+            <span class="nav-tooltip">Vídeos</span>
+        </a>
+        <a class="nav-item" data-view="galeria" href="#">
+            <i class="fas fa-images"></i>
+            <span class="nav-text">Galeria</span>
+            <span class="nav-tooltip">Galeria</span>
+        </a>
+        <a class="nav-item" data-view="packs" href="#">
+            <i class="fas fa-box-open"></i>
+            <span class="nav-text">Packs de Modelos</span>
+            <span class="nav-badge ml-auto text-xs font-semibold px-2 py-0.5 rounded-full" style="background:var(--pink);color:#fff">Hot</span>
+            <span class="nav-tooltip">Packs</span>
+        </a>
+        <div class="divider mx-2"></div>
+        <p class="nav-section-label text-xs uppercase tracking-widest px-2 mb-2.5 font-medium" style="color:rgba(255,255,255,.28)">Conta</p>
+        <a class="nav-item" data-view="support" href="#">
+            <i class="fas fa-life-ring"></i>
+            <span class="nav-text">Suporte</span>
+            <span class="nav-tooltip">Suporte</span>
+        </a>
+        <a class="nav-item" data-view="profile" href="#">
+            <i class="fas fa-user-circle"></i>
+            <span class="nav-text">Meu Perfil</span>
+            <span class="nav-tooltip">Meu Perfil</span>
+        </a>
+    </nav>
+
+    <!-- Toggle + Logout -->
+    <div class="mt-auto">
+        <div class="px-4 pb-2">
+            <button id="sidebar-toggle" class="sidebar-toggle-btn">
+                <i class="fas fa-chevron-left"></i>
+                <span class="nav-text text-xs font-medium" style="color:rgba(255,255,255,.42)">Recolher menu</span>
+            </button>
+        </div>
+        <div class="px-4 pb-4">
+            <button id="btn-logout" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200"
+                style="color:rgba(255,80,80,.8);border:1px solid rgba(255,80,80,.18)"
+                onmouseover="this.style.background='rgba(255,80,80,.1)';this.style.color='#ff6060'"
+                onmouseout="this.style.background='transparent';this.style.color='rgba(255,80,80,.8)'">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="nav-text">Sair da conta</span>
+                <span class="nav-tooltip">Sair</span>
+            </button>
+        </div>
+    </div>
+</aside>
+
+
+<!-- ═══════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════ -->
+<main class="main-content" id="mainContent">
+
+    <!-- Top header (always visible) -->
+    <header class="flex items-center justify-between mb-7">
+        <div class="flex items-center gap-3">
+            <button class="md:hidden w-10 h-10 glass rounded-xl flex items-center justify-center text-white" onclick="toggleSidebar()">
+                <i class="fas fa-bars text-sm"></i>
+            </button>
+            <div>
+                <h2 class="text-white font-semibold text-lg leading-tight" id="header-page-title">Dashboard</h2>
+                <p class="text-xs" style="color:rgba(255,255,255,.35)">Olá, Ana! Bem-vinda de volta.</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2.5">
+            <div class="relative hidden sm:block">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs" style="color:rgba(255,255,255,.35)"></i>
+                <input type="text" placeholder="Buscar conteúdos…" class="search-input w-44 lg:w-60" id="global-search">
+            </div>
+            <button class="relative w-10 h-10 glass rounded-xl flex items-center justify-center transition-colors"
+                style="color:rgba(255,255,255,.45)"
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'">
+                <i class="fas fa-bell text-sm"></i>
+                <span class="absolute top-2 right-2 w-2 h-2 rounded-full" style="background:var(--pink)"></span>
+            </button>
+        </div>
+    </header>
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: DASHBOARD
+    ═══════════════════════════════════════════ -->
+    <div id="view-dashboard" class="view active">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner p-6 md:p-8 mb-7 relative z-0">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                <div class="flex-1">
+                    <div class="flex items-center gap-1 mb-3" style="height:22px">
+                        <span class="wave-bar" style="height:10px"></span><span class="wave-bar" style="height:16px"></span>
+                        <span class="wave-bar" style="height:22px"></span><span class="wave-bar" style="height:14px"></span>
+                        <span class="wave-bar" style="height:20px"></span><span class="wave-bar" style="height:12px"></span>
+                        <span class="badge-new ml-2">Premium</span>
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-2.5 leading-snug">Você está no caminho certo! 🦋</h2>
+                    <p class="text-sm md:text-base leading-relaxed max-w-lg" style="color:rgba(255,255,255,.65)">
+                        Acesse seus áudios, roteiros e materiais exclusivos para elevar a qualidade do seu conteúdo.
+                        Você tem <span style="color:#FF7AAC;font-weight:600">3 novos materiais</span> esperando por você.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 mt-5">
+                        <button class="btn-pink pulse flex items-center gap-2" id="cta-learn">
+                            <i class="fas fa-play text-xs"></i> Continuar Aprendendo
+                        </button>
+                        <button class="btn-ghost flex items-center gap-2" id="cta-news">
+                            Ver Novidades <i class="fas fa-arrow-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="hidden lg:flex flex-col gap-3 flex-shrink-0">
+                    <div class="glass-pink rounded-2xl px-5 py-4 text-center min-w-[6.5rem]">
+                        <p class="text-3xl font-bold" style="color:var(--pink)">24</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.45)">Áudios</p>
+                    </div>
+                    <div class="glass-pink rounded-2xl px-5 py-4 text-center">
+                        <p class="text-3xl font-bold" style="color:var(--pink)">18</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.45)">Materiais</p>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute -bottom-10 -right-10 w-44 h-44 rounded-full pointer-events-none" style="border:1px solid rgba(255,45,120,.18)"></div>
+            <div class="absolute -bottom-4  -right-4  w-24 h-24 rounded-full pointer-events-none" style="border:1px solid rgba(255,45,120,.3)"></div>
+        </div>
+
+        <!-- Continue card -->
+        <div class="mb-7">
+            <h3 class="font-semibold text-base flex items-center gap-2 mb-3">
+                <i class="fas fa-history text-sm" style="color:var(--pink)"></i> Continuar de onde parou
+            </h3>
+            <div class="continue-card">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 glow-pink card-icon"
+                         style="background:linear-gradient(135deg,#c0185a,#6d1580)">
+                        <i class="fas fa-microphone text-white text-xl"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="tag">Áudio</span>
+                            <span class="text-xs" style="color:rgba(255,255,255,.35)">Ep. 07</span>
+                        </div>
+                        <p class="text-sm font-medium truncate">Como gravar com confiança e naturalidade</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Parou em <span class="time-cur">14:32</span> de <span class="time-dur">28:45</span></p>
+                        <div class="mt-2.5">
+                            <input type="range" class="range" value="51" min="0" max="100">
+                        </div>
+                    </div>
+                    <button class="play-btn audio-card" id="player-0" data-duration="1725" data-start="872">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Novidades -->
+        <div class="mb-9">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-base flex items-center gap-2">
+                    <i class="fas fa-star text-sm" style="color:var(--pink)"></i> Novidades para você
+                </h3>
+                <a href="#" class="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity" style="color:var(--pink)" onclick="event.preventDefault()">
+                    Ver todos <i class="fas fa-chevron-right text-xs"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Novidade 1 -->
+                <div class="card group cursor-pointer">
+                    <div class="relative h-32 overflow-hidden flex items-center justify-center" style="background:linear-gradient(135deg,#3a0924,#1a0830)">
+                        <div class="absolute inset-0 opacity-50" style="background:linear-gradient(135deg,rgba(255,45,120,.6),rgba(120,0,150,.6))"></div>
+                        <i class="fas fa-headphones text-5xl text-white opacity-60 relative z-10 card-icon"></i>
+                        <span class="absolute top-3 left-3 badge-new">Novo</span>
+                        <span class="absolute top-3 right-3 text-xs rounded-full px-2.5 py-0.5" style="background:rgba(0,0,0,.55);color:rgba(255,255,255,.8)">32 min</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2"><span class="tag">Áudio Guia</span></div>
+                        <h4 class="text-sm font-medium mb-1 transition-colors group-hover:text-pink-300">Técnicas de voz para gravações premium</h4>
+                        <p class="text-xs mb-3" style="color:rgba(255,255,255,.35)">Adicionado há 2 dias</p>
+                        <div class="flex items-center justify-between">
+                            <span style="color:rgba(255,200,0,.85);font-size:12px">★★★★★</span>
+                            <button class="play-btn sm mini-play-btn" data-title="Técnicas de voz para gravações premium">
+                                <i class="fas fa-play" style="font-size:11px;margin-left:2px"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Novidade 2 -->
+                <div class="card group cursor-pointer">
+                    <div class="relative h-32 overflow-hidden flex items-center justify-center" style="background:linear-gradient(135deg,#1a0830,#0d1a30)">
+                        <div class="absolute inset-0 opacity-50" style="background:linear-gradient(135deg,rgba(100,0,180,.6),rgba(255,45,120,.4))"></div>
+                        <i class="fas fa-file-alt text-5xl text-white opacity-60 relative z-10 card-icon"></i>
+                        <span class="absolute top-3 left-3 badge-new">Novo</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2"><span class="tag">Script</span></div>
+                        <h4 class="text-sm font-medium mb-1 transition-colors group-hover:text-pink-300">Roteiro: Abordagem sensual — Nível Iniciante</h4>
+                        <p class="text-xs mb-3" style="color:rgba(255,255,255,.35)">Adicionado há 3 dias</p>
+                        <div class="flex items-center justify-between">
+                            <span style="color:rgba(255,200,0,.85);font-size:12px">★★★★☆</span>
+                            <button class="btn-pink dl-btn" style="padding:6px 14px;font-size:12px;border-radius:10px" data-title="Roteiro: Abordagem sensual">
+                                <i class="fas fa-download mr-1"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Novidade 3 -->
+                <div class="card group cursor-pointer">
+                    <div class="relative h-32 overflow-hidden flex items-center justify-center" style="background:linear-gradient(135deg,#2a0a18,#1a0a10)">
+                        <div class="absolute inset-0 opacity-50" style="background:linear-gradient(135deg,rgba(220,0,80,.5),rgba(255,45,120,.3))"></div>
+                        <i class="fas fa-lightbulb text-5xl text-white opacity-60 relative z-10 card-icon"></i>
+                        <span class="absolute top-3 right-3 text-xs rounded-full px-2.5 py-0.5" style="background:rgba(0,0,0,.55);color:rgba(255,255,255,.8)">PDF</span>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2"><span class="tag">Dicas</span></div>
+                        <h4 class="text-sm font-medium mb-1 transition-colors group-hover:text-pink-300">15 dicas para fidelizar seus assinantes</h4>
+                        <p class="text-xs mb-3" style="color:rgba(255,255,255,.35)">Adicionado há 5 dias</p>
+                        <div class="flex items-center justify-between">
+                            <span style="color:rgba(255,200,0,.85);font-size:12px">★★★★★</span>
+                            <button class="btn-pink dl-btn" style="padding:6px 14px;font-size:12px;border-radius:10px" data-title="15 dicas para fidelizar">
+                                <i class="fas fa-download mr-1"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- /view-dashboard -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: BIBLIOTECA DE ÁUDIOS
+    ═══════════════════════════════════════════ -->
+    <div id="view-audios" class="view">
+
+        <!-- Filters + search -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div class="flex gap-2 flex-wrap">
+                <button class="filter-btn active glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-filter="all"
+                        style="color:var(--pink);border-color:rgba(255,45,120,.4)">Todos</button>
+                <button class="filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-filter="guia"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Guias</button>
+                <button class="filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-filter="roteiro"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Roteiros</button>
+                <button class="filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-filter="tecnica"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Técnicas</button>
+            </div>
+            <p class="text-xs" style="color:rgba(255,255,255,.35)">6 áudios disponíveis</p>
+        </div>
+
+        <!-- Audio grid dinâmico (Drive) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="audio-grid-dynamic"></div>
+
+        <!-- Audio grid estático legado -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="audio-grid-static">
+
+            <!-- Player 1 -->
+            <div class="audio-card-wrap">
+                <div class="card audio-card p-5" id="player-1" data-duration="1410" data-category="guia">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#c0185a,#6d1580)">
+                            <i class="fas fa-microphone text-white card-icon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1"><span class="tag">Guia de Voz</span></div>
+                            <p class="text-sm font-medium truncate">Como usar a voz de forma sedutora</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Narração por Hotfy Studio</p>
+                        </div>
+                    </div>
+                    <div class="wave-static mb-3.5">
+                        <span style="height:30%"></span><span style="height:60%"></span><span style="height:80%"></span><span style="height:50%"></span><span style="height:90%"></span><span style="height:40%"></span><span style="height:70%"></span><span style="height:55%"></span><span style="height:85%"></span><span style="height:45%"></span><span style="height:65%"></span><span style="height:35%"></span><span style="height:75%"></span><span style="height:50%"></span><span style="height:80%"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="range" class="range" value="0" min="0" max="100">
+                        <div class="flex justify-between text-xs mt-1" style="color:rgba(255,255,255,.38)">
+                            <span class="time-cur">00:00</span><span class="time-dur">23:30</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-volume-up text-xs" style="color:rgba(255,255,255,.45)"></i>
+                            <input type="range" class="vol-range" value="80" min="0" max="100">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-backward"></i></button>
+                            <button class="play-btn"><i class="fas fa-play"></i></button>
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <button class="audio-dl-btn text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 2 -->
+            <div class="audio-card-wrap">
+                <div class="card audio-card p-5" id="player-2" data-duration="1087" data-category="roteiro">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#3c1270,#1e0640)">
+                            <i class="fas fa-headphones text-white card-icon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1"><span class="tag">Roteiro</span></div>
+                            <p class="text-sm font-medium truncate">Roteiro narrado: Encontro inesperado</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Narração completa</p>
+                        </div>
+                    </div>
+                    <div class="wave-static mb-3.5">
+                        <span style="height:65%"></span><span style="height:35%"></span><span style="height:80%"></span><span style="height:55%"></span><span style="height:70%"></span><span style="height:45%"></span><span style="height:90%"></span><span style="height:60%"></span><span style="height:40%"></span><span style="height:75%"></span><span style="height:50%"></span><span style="height:85%"></span><span style="height:30%"></span><span style="height:65%"></span><span style="height:55%"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="range" class="range" value="0" min="0" max="100">
+                        <div class="flex justify-between text-xs mt-1" style="color:rgba(255,255,255,.38)">
+                            <span class="time-cur">00:00</span><span class="time-dur">18:07</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-volume-up text-xs" style="color:rgba(255,255,255,.45)"></i>
+                            <input type="range" class="vol-range" value="75" min="0" max="100">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-backward"></i></button>
+                            <button class="play-btn"><i class="fas fa-play"></i></button>
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <button class="audio-dl-btn text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 3 -->
+            <div class="audio-card-wrap">
+                <div class="card audio-card p-5" id="player-3" data-duration="764" data-category="tecnica">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#8c1a2e,#4a0a20)">
+                            <i class="fas fa-music text-white card-icon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1"><span class="tag">Técnica</span></div>
+                            <p class="text-sm font-medium truncate">Respiração e ritmo na narração</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Técnicas avançadas</p>
+                        </div>
+                    </div>
+                    <div class="wave-static mb-3.5">
+                        <span style="height:50%"></span><span style="height:80%"></span><span style="height:40%"></span><span style="height:90%"></span><span style="height:60%"></span><span style="height:35%"></span><span style="height:75%"></span><span style="height:55%"></span><span style="height:85%"></span><span style="height:45%"></span><span style="height:70%"></span><span style="height:30%"></span><span style="height:65%"></span><span style="height:80%"></span><span style="height:50%"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="range" class="range" value="0" min="0" max="100">
+                        <div class="flex justify-between text-xs mt-1" style="color:rgba(255,255,255,.38)">
+                            <span class="time-cur">00:00</span><span class="time-dur">12:44</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-volume-up text-xs" style="color:rgba(255,255,255,.45)"></i>
+                            <input type="range" class="vol-range" value="70" min="0" max="100">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-backward"></i></button>
+                            <button class="play-btn"><i class="fas fa-play"></i></button>
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <button class="audio-dl-btn text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 4 -->
+            <div class="audio-card-wrap">
+                <div class="card audio-card p-5" id="player-4" data-duration="2475" data-category="guia">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#1a3a60,#0d1e40)">
+                            <i class="fas fa-star text-white card-icon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="tag">Guia Premium</span><span class="badge-new">Novo</span>
+                            </div>
+                            <p class="text-sm font-medium truncate">Engajamento: Psicologia do desejo</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Nível avançado</p>
+                        </div>
+                    </div>
+                    <div class="wave-static mb-3.5">
+                        <span style="height:45%"></span><span style="height:75%"></span><span style="height:55%"></span><span style="height:90%"></span><span style="height:35%"></span><span style="height:70%"></span><span style="height:60%"></span><span style="height:85%"></span><span style="height:40%"></span><span style="height:65%"></span><span style="height:50%"></span><span style="height:80%"></span><span style="height:30%"></span><span style="height:70%"></span><span style="height:55%"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="range" class="range" value="0" min="0" max="100">
+                        <div class="flex justify-between text-xs mt-1" style="color:rgba(255,255,255,.38)">
+                            <span class="time-cur">00:00</span><span class="time-dur">41:15</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-volume-up text-xs" style="color:rgba(255,255,255,.45)"></i>
+                            <input type="range" class="vol-range" value="85" min="0" max="100">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-backward"></i></button>
+                            <button class="play-btn"><i class="fas fa-play"></i></button>
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <button class="audio-dl-btn text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 5 -->
+            <div class="audio-card-wrap">
+                <div class="card audio-card p-5" id="player-5" data-duration="920" data-category="tecnica">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#1e5a3a,#0a2e1e)">
+                            <i class="fas fa-volume-up text-white card-icon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1"><span class="tag">Técnica</span></div>
+                            <p class="text-sm font-medium truncate">Dicção e clareza vocal</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Exercícios práticos</p>
+                        </div>
+                    </div>
+                    <div class="wave-static mb-3.5">
+                        <span style="height:70%"></span><span style="height:40%"></span><span style="height:85%"></span><span style="height:55%"></span><span style="height:30%"></span><span style="height:75%"></span><span style="height:50%"></span><span style="height:90%"></span><span style="height:65%"></span><span style="height:35%"></span><span style="height:80%"></span><span style="height:45%"></span><span style="height:60%"></span><span style="height:85%"></span><span style="height:40%"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="range" class="range" value="0" min="0" max="100">
+                        <div class="flex justify-between text-xs mt-1" style="color:rgba(255,255,255,.38)">
+                            <span class="time-cur">00:00</span><span class="time-dur">15:20</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-volume-up text-xs" style="color:rgba(255,255,255,.45)"></i>
+                            <input type="range" class="vol-range" value="78" min="0" max="100">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-backward"></i></button>
+                            <button class="play-btn"><i class="fas fa-play"></i></button>
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <button class="audio-dl-btn text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 6 -->
+            <div class="audio-card-wrap">
+                <div class="card audio-card p-5" id="player-6" data-duration="1330" data-category="roteiro">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#6b2060,#2a0a30)">
+                            <i class="fas fa-pen-fancy text-white card-icon"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="tag">Roteiro</span><span class="badge-new">Novo</span>
+                            </div>
+                            <p class="text-sm font-medium truncate">Script: Noite de confissões</p>
+                            <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Alto engajamento</p>
+                        </div>
+                    </div>
+                    <div class="wave-static mb-3.5">
+                        <span style="height:35%"></span><span style="height:80%"></span><span style="height:50%"></span><span style="height:65%"></span><span style="height:90%"></span><span style="height:40%"></span><span style="height:75%"></span><span style="height:55%"></span><span style="height:30%"></span><span style="height:85%"></span><span style="height:60%"></span><span style="height:45%"></span><span style="height:70%"></span><span style="height:35%"></span><span style="height:80%"></span>
+                    </div>
+                    <div class="mb-3">
+                        <input type="range" class="range" value="0" min="0" max="100">
+                        <div class="flex justify-between text-xs mt-1" style="color:rgba(255,255,255,.38)">
+                            <span class="time-cur">00:00</span><span class="time-dur">22:10</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-volume-up text-xs" style="color:rgba(255,255,255,.45)"></i>
+                            <input type="range" class="vol-range" value="82" min="0" max="100">
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-backward"></i></button>
+                            <button class="play-btn"><i class="fas fa-play"></i></button>
+                            <button class="text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-forward"></i></button>
+                        </div>
+                        <button class="audio-dl-btn text-sm" style="color:rgba(255,255,255,.4)" onmouseover="this.style.color='var(--pink)'" onmouseout="this.style.color='rgba(255,255,255,.4)'"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /audio grid -->
+    </div><!-- /view-audios -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: MATERIAIS E SCRIPTS
+    ═══════════════════════════════════════════ -->
+    <div id="view-materials" class="view">
+
+        <!-- Search bar -->
+        <div class="relative mb-6">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-sm" style="color:rgba(255,255,255,.35)"></i>
+            <input id="material-search" type="text" placeholder="Buscar materiais, scripts, templates…" class="search-input" style="padding-left:44px;font-size:14px;border-radius:14px">
+        </div>
+
+        <!-- Category pills -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <span class="tag cursor-pointer hover:opacity-80">Todos</span>
+            <span class="tag cursor-pointer hover:opacity-80">PDF</span>
+            <span class="tag cursor-pointer hover:opacity-80">Scripts</span>
+            <span class="tag cursor-pointer hover:opacity-80">Templates</span>
+            <span class="tag cursor-pointer hover:opacity-80">Planilhas</span>
+        </div>
+
+        <!-- Materials grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="materials-grid">
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28)">
+                        <i class="dl-icon fas fa-file-pdf text-2xl" style="color:#ef4444"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="badge-new">Novo</span><span class="text-xs" style="color:rgba(255,255,255,.38)">PDF · 2.3 MB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Guia completo de roteirização sensual</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">32 páginas</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Guia completo de roteirização sensual">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.28)">
+                        <i class="dl-icon fas fa-file-word text-2xl" style="color:#3b82f6"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="text-xs" style="color:rgba(255,255,255,.38)">DOCX · 450 KB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Template: Bio otimizada para perfil</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">8 modelos prontos</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Template: Bio otimizada para perfil">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,45,120,.1);border:1px solid rgba(255,45,120,.24)">
+                        <i class="dl-icon fas fa-file-alt text-2xl" style="color:var(--pink)"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="badge-new">Novo</span><span class="text-xs" style="color:rgba(255,255,255,.38)">PDF · 1.1 MB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Script: Roleplay temático v2.0</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">15 cenas · Alto engajamento</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Script: Roleplay temático v2.0">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(234,179,8,.12);border:1px solid rgba(234,179,8,.28)">
+                        <i class="dl-icon fas fa-table text-2xl" style="color:#eab308"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="text-xs" style="color:rgba(255,255,255,.38)">XLSX · 320 KB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Planilha: Controle de faturamento</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Automatizada com fórmulas</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Planilha: Controle de faturamento">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28)">
+                        <i class="dl-icon fas fa-file-pdf text-2xl" style="color:#ef4444"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="badge-new">Novo</span><span class="text-xs" style="color:rgba(255,255,255,.38)">PDF · 3.8 MB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Guia de iluminação para foto e vídeo</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">48 páginas com exemplos</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Guia de iluminação para foto e vídeo">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.28)">
+                        <i class="dl-icon fas fa-file-word text-2xl" style="color:#3b82f6"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="text-xs" style="color:rgba(255,255,255,.38)">DOCX · 680 KB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Templates de legendas e captions</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">20 templates prontos</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Templates de legendas e captions">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,45,120,.1);border:1px solid rgba(255,45,120,.24)">
+                        <i class="dl-icon fas fa-check-square text-2xl" style="color:var(--pink)"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="text-xs" style="color:rgba(255,255,255,.38)">PDF · 850 KB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Checklist: Setup profissional de áudio</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">Configuração passo a passo</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Checklist: Setup profissional de áudio">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+            <div class="dl-card">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.28)">
+                        <i class="dl-icon fas fa-file-pdf text-2xl" style="color:#ef4444"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5"><span class="badge-new">Novo</span><span class="text-xs" style="color:rgba(255,255,255,.38)">PDF · 1.4 MB</span></div>
+                        <p class="text-sm font-medium leading-snug dl-title">Script: Romance de verão</p>
+                        <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.38)">12 cenas · Estilo leve</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn-pink dl-btn flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px" data-title="Script: Romance de verão">
+                        <i class="fas fa-download"></i> Baixar Material
+                    </button>
+                    <button class="glass w-10 h-10 rounded-xl flex items-center justify-center transition-colors text-sm" style="color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.45)'"><i class="fas fa-eye"></i></button>
+                </div>
+            </div>
+
+        </div><!-- /materials-grid -->
+
+        <!-- Empty state (hidden by default) -->
+        <div id="materials-empty" class="hidden text-center py-16">
+            <i class="fas fa-search text-4xl mb-4 block" style="color:rgba(255,45,120,.3)"></i>
+            <p class="text-sm" style="color:rgba(255,255,255,.4)">Nenhum material encontrado para "<span id="search-query-label"></span>"</p>
+        </div>
+
+    </div><!-- /view-materials -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: SUPORTE
+    ═══════════════════════════════════════════ -->
+    <div id="view-support" class="view">
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+            <!-- Contact form (3/5 width) -->
+            <div class="lg:col-span-3">
+                <div class="glass-pink rounded-2xl p-6 mb-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(255,45,120,.15)">
+                            <i class="fas fa-paper-plane" style="color:var(--pink)"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-white font-semibold text-base">Fale com a Hotfy</h3>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">Respondemos em até 24 horas</p>
+                        </div>
+                    </div>
+
+                    <form id="support-form" class="space-y-4">
+                        <div>
+                            <label class="form-label">Nome completo</label>
+                            <input type="text" class="form-input" placeholder="Seu nome" value="Ana Silveira">
+                        </div>
+                        <div>
+                            <label class="form-label">Assunto</label>
+                            <select class="form-input" style="cursor:pointer">
+                                <option value="" disabled selected style="background:#18181f">Selecione um assunto</option>
+                                <option style="background:#18181f">Problema técnico</option>
+                                <option style="background:#18181f">Dúvida sobre conteúdo</option>
+                                <option style="background:#18181f">Cobrança e assinatura</option>
+                                <option style="background:#18181f">Sugestão de conteúdo</option>
+                                <option style="background:#18181f">Outro</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Mensagem</label>
+                            <textarea class="form-input" rows="5" placeholder="Descreva como podemos ajudar..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-pink w-full flex items-center justify-center gap-2" style="padding:13px">
+                            <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact info pills -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="glass rounded-xl p-4 flex items-center gap-3">
+                        <i class="fas fa-envelope" style="color:var(--pink)"></i>
+                        <div>
+                            <p class="text-xs font-medium text-white">E-mail</p>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">suporte@hotfy.com</p>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 flex items-center gap-3">
+                        <i class="fab fa-whatsapp" style="color:#25d366"></i>
+                        <div>
+                            <p class="text-xs font-medium text-white">WhatsApp</p>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">Seg–Sex 9h–18h</p>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 flex items-center gap-3">
+                        <i class="fas fa-clock" style="color:var(--pink)"></i>
+                        <div>
+                            <p class="text-xs font-medium text-white">Resposta</p>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">Até 24 horas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ (2/5 width) -->
+            <div class="lg:col-span-2">
+                <h3 class="font-semibold text-base flex items-center gap-2 mb-4">
+                    <i class="fas fa-question-circle text-sm" style="color:var(--pink)"></i> Perguntas Frequentes
+                </h3>
+                <div class="space-y-3">
+
+                    <div class="faq-item">
+                        <button class="faq-trigger">
+                            <span>Como faço para baixar os materiais?</span>
+                            <i class="faq-icon fas fa-plus"></i>
+                        </button>
+                        <div class="faq-body">
+                            <div class="faq-body-inner">
+                                Acesse a seção "Materiais e Scripts" no menu lateral. Clique no botão
+                                <strong style="color:rgba(255,255,255,.8)">"Baixar Material"</strong> em qualquer card.
+                                O arquivo será enviado diretamente para o seu dispositivo. Em mobile,
+                                verifique sua pasta de Downloads.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger">
+                            <span>Posso acessar a plataforma pelo celular?</span>
+                            <i class="faq-icon fas fa-plus"></i>
+                        </button>
+                        <div class="faq-body">
+                            <div class="faq-body-inner">
+                                Sim! A Hotfy é totalmente responsiva e otimizada para mobile.
+                                Você pode ouvir os áudios, baixar materiais e acessar todo o conteúdo
+                                diretamente pelo navegador do seu celular, sem precisar instalar nenhum aplicativo.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger">
+                            <span>Com que frequência há novos conteúdos?</span>
+                            <i class="faq-icon fas fa-plus"></i>
+                        </button>
+                        <div class="faq-body">
+                            <div class="faq-body-inner">
+                                Adicionamos novos áudios e materiais toda semana. Fique de olho
+                                na seção "Novidades" no Dashboard para ver os conteúdos mais recentes.
+                                Você também recebe notificações quando novos conteúdos são publicados.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger">
+                            <span>Como funciona a renovação da assinatura?</span>
+                            <i class="faq-icon fas fa-plus"></i>
+                        </button>
+                        <div class="faq-body">
+                            <div class="faq-body-inner">
+                                Sua assinatura Premium é renovada automaticamente a cada 30 dias.
+                                Você receberá um e-mail de aviso 3 dias antes da renovação.
+                                Para cancelar ou alterar o plano, acesse "Meu Perfil" → "Assinatura".
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger">
+                            <span>Esqueci minha senha. Como recuperar?</span>
+                            <i class="faq-icon fas fa-plus"></i>
+                        </button>
+                        <div class="faq-body">
+                            <div class="faq-body-inner">
+                                Acesse "Meu Perfil" → "Alterar Senha" para redefinir sua senha enquanto
+                                estiver logada. Se perdeu o acesso, clique em "Esqueci a senha" na tela
+                                de login — você receberá um link de recuperação no e-mail cadastrado.
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /faq space-y -->
+            </div>
+
+        </div><!-- /grid -->
+    </div><!-- /view-support -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: MEU PERFIL
+    ═══════════════════════════════════════════ -->
+    <div id="view-profile" class="view">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Profile card -->
+            <div class="lg:col-span-1">
+                <div class="glass-pink rounded-2xl p-6 text-center">
+                    <!-- Avatar -->
+                    <div class="flex justify-center mb-4">
+                        <div class="relative">
+                            <div class="avatar-ring p-0.5">
+                                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-pink-600 to-purple-800 flex items-center justify-center text-white font-bold text-3xl">A</div>
+                            </div>
+                            <button class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-xs border-2" style="background:var(--pink);border-color:var(--bg3)"
+                                    onclick="showToast('Função de upload de foto em breve! 📸','info')">
+                                <i class="fas fa-camera text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h3 class="text-white font-bold text-xl mb-1">Ana Silveira</h3>
+                    <p class="text-sm mb-3" style="color:rgba(255,255,255,.45)">ana.silveira@email.com</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-5" style="background:rgba(255,45,120,.12);border:1px solid rgba(255,45,120,.25)">
+                        <span class="w-1.5 h-1.5 rounded-full" style="background:var(--pink)"></span>
+                        <span class="text-xs font-semibold" style="color:var(--pink)">Membro Premium</span>
+                    </div>
+                    <!-- Quick stats -->
+                    <div class="grid grid-cols-2 gap-3 mt-2">
+                        <div class="glass rounded-xl p-3">
+                            <p class="text-lg font-bold" style="color:var(--pink)">24</p>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">Áudios</p>
+                        </div>
+                        <div class="glass rounded-xl p-3">
+                            <p class="text-lg font-bold" style="color:var(--pink)">18</p>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">Materiais</p>
+                        </div>
+                        <div class="glass rounded-xl p-3 col-span-2">
+                            <p class="text-sm font-semibold text-white">Membro desde</p>
+                            <p class="text-xs" style="color:rgba(255,255,255,.4)">Janeiro de 2025</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="lg:col-span-2 space-y-5">
+
+                <!-- Account info -->
+                <div class="card p-6">
+                    <h4 class="text-white font-semibold text-sm mb-4 flex items-center gap-2">
+                        <i class="fas fa-user" style="color:var(--pink)"></i> Informações da Conta
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Nome</label>
+                            <input type="text" class="form-input" value="Ana Silveira">
+                        </div>
+                        <div>
+                            <label class="form-label">E-mail</label>
+                            <input type="email" class="form-input" value="ana.silveira@email.com">
+                        </div>
+                        <div>
+                            <label class="form-label">Plano</label>
+                            <input type="text" class="form-input" value="Premium" readonly style="cursor:not-allowed;opacity:.6">
+                        </div>
+                        <div>
+                            <label class="form-label">Próxima renovação</label>
+                            <input type="text" class="form-input" value="10/07/2026" readonly style="cursor:not-allowed;opacity:.6">
+                        </div>
+                    </div>
+                    <button class="btn-pink mt-4 flex items-center gap-2 text-sm" style="padding:10px 22px"
+                            onclick="showToast('Informações salvas com sucesso! ✅','success')">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                </div>
+
+                <!-- Change password -->
+                <div class="card p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-white font-semibold text-sm flex items-center gap-2">
+                            <i class="fas fa-lock" style="color:var(--pink)"></i> Segurança
+                        </h4>
+                        <button class="btn-ghost text-xs" style="padding:7px 14px" id="toggle-password">Alterar Senha</button>
+                    </div>
+
+                    <div id="password-section">
+                        <div class="pt-4 space-y-3">
+                            <div>
+                                <label class="form-label">Senha atual</label>
+                                <input type="password" class="form-input" id="current-password" placeholder="••••••••">
+                            </div>
+                            <div>
+                                <label class="form-label">Nova senha</label>
+                                <input type="password" class="form-input" id="new-password" placeholder="Mínimo 8 caracteres">
+                            </div>
+                            <div>
+                                <label class="form-label">Confirmar nova senha</label>
+                                <input type="password" class="form-input" id="confirm-password" placeholder="Repita a nova senha">
+                            </div>
+                            <button class="btn-pink flex items-center gap-2 text-sm" style="padding:10px 22px" id="save-password">
+                                <i class="fas fa-shield-alt"></i> Salvar Nova Senha
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="card p-6">
+                    <h4 class="text-white font-semibold text-sm flex items-center gap-2 mb-4">
+                        <i class="fas fa-bell" style="color:var(--pink)"></i> Preferências de Notificação
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="toggle-wrap">
+                            <div>
+                                <p class="text-sm font-medium text-white">Novos áudios adicionados</p>
+                                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.4)">Receba avisos quando novos áudios forem publicados</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notif-toggle" data-label="Notificações de novos áudios" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-wrap">
+                            <div>
+                                <p class="text-sm font-medium text-white">Novas mensagens de suporte</p>
+                                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.4)">Respostas da equipe Hotfy</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notif-toggle" data-label="Notificações de suporte" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-wrap">
+                            <div>
+                                <p class="text-sm font-medium text-white">Atualizações da plataforma</p>
+                                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.4)">Novidades e melhorias na Hotfy</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notif-toggle" data-label="Notificações de atualizações">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-wrap">
+                            <div>
+                                <p class="text-sm font-medium text-white">Promoções e ofertas</p>
+                                <p class="text-xs mt-0.5" style="color:rgba(255,255,255,.4)">Descontos e condições especiais</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" class="notif-toggle" data-label="Notificações de promoções">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /settings col -->
+        </div><!-- /grid -->
+    </div><!-- /view-profile -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: VÍDEOS
+    ═══════════════════════════════════════════ -->
+    <div id="view-videos" class="view">
+        <div class="flex items-center justify-between mb-6">
+            <p class="text-xs" id="video-count-label" style="color:rgba(255,255,255,.35)">Carregando…</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" id="video-grid-dynamic">
+            <div class="col-span-3 text-center py-16">
+                <i class="fas fa-spinner fa-spin text-3xl mb-3 block" style="color:rgba(255,45,120,.4)"></i>
+                <p class="text-sm" style="color:rgba(255,255,255,.35)">Carregando vídeos do Drive…</p>
+            </div>
+        </div>
+    </div><!-- /view-videos -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: GALERIA DE FOTOS
+    ═══════════════════════════════════════════ -->
+    <div id="view-galeria" class="view">
+        <div class="flex items-center justify-between mb-6">
+            <p class="text-xs" id="photo-count-label" style="color:rgba(255,255,255,.35)">Carregando…</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3" id="photo-grid-dynamic">
+            <div class="col-span-4 text-center py-16">
+                <i class="fas fa-spinner fa-spin text-3xl mb-3 block" style="color:rgba(255,45,120,.4)"></i>
+                <p class="text-sm" style="color:rgba(255,255,255,.35)">Carregando galeria do Drive…</p>
+            </div>
+        </div>
+    </div><!-- /view-galeria -->
+
+
+    <!-- ═══════════════════════════════════════════
+         VIEW: PACKS DE MODELOS
+    ═══════════════════════════════════════════ -->
+    <div id="view-packs" class="view">
+
+        <!-- Filter tabs -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div class="flex gap-2 flex-wrap">
+                <button class="pack-filter-btn active glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-model="all"
+                        style="color:var(--pink);border-color:rgba(255,45,120,.4)">Todos</button>
+                <button class="pack-filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-model="sofia"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Sofia Melo</button>
+                <button class="pack-filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-model="luna"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Luna Ferreira</button>
+                <button class="pack-filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-model="valentina"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Valentina Cruz</button>
+                <button class="pack-filter-btn glass rounded-xl px-3 py-1.5 text-xs font-medium border transition-colors" data-model="isabella"
+                        style="color:rgba(255,255,255,.45);border-color:var(--border)">Isabella Rocha</button>
+            </div>
+            <p class="text-xs" style="color:rgba(255,255,255,.35)">6 packs disponíveis</p>
+        </div>
+
+        <!-- Packs grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+
+            <!-- Pack 1 — Sofia Melo: Verão 2026 -->
+            <div class="pack-card-wrap">
+                <div class="pack-card" data-pack-id="pack-1" data-model="sofia" data-title="Verão 2026">
+                    <div class="pack-cover" style="background:linear-gradient(135deg,#c0185a,#6d1580)">
+                        <span class="pack-cover-letter">S</span>
+                        <div class="pack-model-chip">
+                            <div class="pack-model-avatar" style="background:linear-gradient(135deg,#c0185a,#6d1580)">S</div>
+                            <span class="text-xs font-semibold" style="color:rgba(255,200,220,.9)">Sofia Melo</span>
+                        </div>
+                        <div class="pack-count-chip">15 arquivos</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="tag">Fotos</span><span class="tag">Vídeos</span>
+                            <span class="badge-new ml-auto">Hot</span>
+                        </div>
+                        <h4 class="text-white font-semibold text-base mb-1">Verão 2026</h4>
+                        <p class="text-xs mb-4" style="color:rgba(255,255,255,.38)">2.4 GB · 15 arquivos exclusivos</p>
+                        <div class="flex gap-2">
+                            <button class="pack-preview-btn btn-ghost flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="pack-dl-btn btn-pink flex items-center justify-center gap-2 text-xs" style="padding:9px 16px">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pack 2 — Sofia Melo: Noite Especial -->
+            <div class="pack-card-wrap">
+                <div class="pack-card" data-pack-id="pack-2" data-model="sofia" data-title="Noite Especial">
+                    <div class="pack-cover" style="background:linear-gradient(135deg,#8c1a2e,#3a0a20)">
+                        <span class="pack-cover-letter">S</span>
+                        <div class="pack-model-chip">
+                            <div class="pack-model-avatar" style="background:linear-gradient(135deg,#8c1a2e,#3a0a20)">S</div>
+                            <span class="text-xs font-semibold" style="color:rgba(255,200,220,.9)">Sofia Melo</span>
+                        </div>
+                        <div class="pack-count-chip">10 arquivos</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="tag">Fotos</span><span class="tag">PDF</span>
+                        </div>
+                        <h4 class="text-white font-semibold text-base mb-1">Noite Especial</h4>
+                        <p class="text-xs mb-4" style="color:rgba(255,255,255,.38)">1.8 GB · 10 arquivos exclusivos</p>
+                        <div class="flex gap-2">
+                            <button class="pack-preview-btn btn-ghost flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="pack-dl-btn btn-pink flex items-center justify-center gap-2 text-xs" style="padding:9px 16px">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pack 3 — Luna Ferreira: Studio Vol.1 -->
+            <div class="pack-card-wrap">
+                <div class="pack-card" data-pack-id="pack-3" data-model="luna" data-title="Studio Vol.1">
+                    <div class="pack-cover" style="background:linear-gradient(135deg,#3c1270,#1e0640)">
+                        <span class="pack-cover-letter">L</span>
+                        <div class="pack-model-chip">
+                            <div class="pack-model-avatar" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">L</div>
+                            <span class="text-xs font-semibold" style="color:rgba(220,200,255,.9)">Luna Ferreira</span>
+                        </div>
+                        <div class="pack-count-chip">12 arquivos</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="tag">Vídeos</span><span class="tag">Fotos</span>
+                            <span class="badge-new ml-auto">Hot</span>
+                        </div>
+                        <h4 class="text-white font-semibold text-base mb-1">Studio Vol.1</h4>
+                        <p class="text-xs mb-4" style="color:rgba(255,255,255,.38)">3.1 GB · 12 arquivos exclusivos</p>
+                        <div class="flex gap-2">
+                            <button class="pack-preview-btn btn-ghost flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="pack-dl-btn btn-pink flex items-center justify-center gap-2 text-xs" style="padding:9px 16px">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pack 4 — Valentina Cruz: Dark Elegance -->
+            <div class="pack-card-wrap">
+                <div class="pack-card" data-pack-id="pack-4" data-model="valentina" data-title="Dark Elegance">
+                    <div class="pack-cover" style="background:linear-gradient(135deg,#1a3a60,#0d1e40)">
+                        <span class="pack-cover-letter">V</span>
+                        <div class="pack-model-chip">
+                            <div class="pack-model-avatar" style="background:linear-gradient(135deg,#1d4ed8,#1e3a8a)">V</div>
+                            <span class="text-xs font-semibold" style="color:rgba(180,210,255,.9)">Valentina Cruz</span>
+                        </div>
+                        <div class="pack-count-chip">8 arquivos</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="tag">Fotos</span><span class="tag">PDF</span>
+                        </div>
+                        <h4 class="text-white font-semibold text-base mb-1">Dark Elegance</h4>
+                        <p class="text-xs mb-4" style="color:rgba(255,255,255,.38)">1.2 GB · 8 arquivos exclusivos</p>
+                        <div class="flex gap-2">
+                            <button class="pack-preview-btn btn-ghost flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="pack-dl-btn btn-pink flex items-center justify-center gap-2 text-xs" style="padding:9px 16px">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pack 5 — Valentina Cruz: Gold Edition -->
+            <div class="pack-card-wrap">
+                <div class="pack-card" data-pack-id="pack-5" data-model="valentina" data-title="Gold Edition">
+                    <div class="pack-cover" style="background:linear-gradient(135deg,#5a4000,#2a1e00)">
+                        <span class="pack-cover-letter">V</span>
+                        <div class="pack-model-chip">
+                            <div class="pack-model-avatar" style="background:linear-gradient(135deg,#d97706,#92400e)">V</div>
+                            <span class="text-xs font-semibold" style="color:rgba(255,230,150,.9)">Valentina Cruz</span>
+                        </div>
+                        <div class="pack-count-chip">14 arquivos</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="tag">Vídeos</span><span class="tag">Fotos</span>
+                            <span class="badge-new ml-auto">Hot</span>
+                        </div>
+                        <h4 class="text-white font-semibold text-base mb-1">Gold Edition</h4>
+                        <p class="text-xs mb-4" style="color:rgba(255,255,255,.38)">2.8 GB · 14 arquivos exclusivos</p>
+                        <div class="flex gap-2">
+                            <button class="pack-preview-btn btn-ghost flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="pack-dl-btn btn-pink flex items-center justify-center gap-2 text-xs" style="padding:9px 16px">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pack 6 — Isabella Rocha: Premium Collection -->
+            <div class="pack-card-wrap">
+                <div class="pack-card" data-pack-id="pack-6" data-model="isabella" data-title="Premium Collection">
+                    <div class="pack-cover" style="background:linear-gradient(135deg,#1e5a3a,#0a2e1e)">
+                        <span class="pack-cover-letter">I</span>
+                        <div class="pack-model-chip">
+                            <div class="pack-model-avatar" style="background:linear-gradient(135deg,#059669,#064e3b)">I</div>
+                            <span class="text-xs font-semibold" style="color:rgba(160,240,200,.9)">Isabella Rocha</span>
+                        </div>
+                        <div class="pack-count-chip">18 arquivos</div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="tag">Fotos</span><span class="tag">Vídeos</span><span class="tag">PDF</span>
+                        </div>
+                        <h4 class="text-white font-semibold text-base mb-1">Premium Collection</h4>
+                        <p class="text-xs mb-4" style="color:rgba(255,255,255,.38)">4.2 GB · 18 arquivos exclusivos</p>
+                        <div class="flex gap-2">
+                            <button class="pack-preview-btn btn-ghost flex-1 flex items-center justify-center gap-2 text-xs" style="padding:9px 12px">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="pack-dl-btn btn-pink flex items-center justify-center gap-2 text-xs" style="padding:9px 16px">
+                                <i class="fas fa-download"></i> Baixar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /packs grid -->
+    </div><!-- /view-packs -->
+
+
+    <!-- Footer -->
+    <footer class="text-center pb-4 mt-10">
+        <p class="text-xs" style="color:rgba(255,255,255,.22)">
+            © 2026 <span class="logo-hot">Hot</span><span class="logo-fy">fy</span>
+            &nbsp;·&nbsp; Todos os direitos reservados
+            &nbsp;·&nbsp;
+            <a href="#" onclick="event.preventDefault()" style="color:rgba(255,255,255,.35)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Termos</a>
+            &nbsp;·&nbsp;
+            <a href="#" onclick="event.preventDefault()" style="color:rgba(255,255,255,.35)" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Privacidade</a>
+        </p>
+    </footer>
+
+</main>
+
+
+<!-- Video Modal -->
+<div id="video-modal" style="position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;padding:16px">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(20px)" onclick="closeVideoModal()"></div>
+    <div style="position:relative;z-index:1;width:100%;max-width:900px;background:var(--bg2);border:1px solid rgba(255,45,120,.25);border-radius:20px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.6)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border)">
+            <p class="text-sm font-semibold text-white truncate" id="video-modal-title" style="max-width:calc(100% - 48px)"></p>
+            <button onclick="closeVideoModal()" class="modal-close-btn" style="position:static;margin-left:12px;flex-shrink:0"><i class="fas fa-times"></i></button>
+        </div>
+        <div style="position:relative;background:#000">
+            <!-- spinner de buffering -->
+            <div id="video-modal-spinner" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;z-index:2;pointer-events:none">
+                <div style="width:48px;height:48px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite"></div>
+            </div>
+            <video id="video-modal-video" controls playsinline
+                   style="display:block;width:100%;max-height:70vh;background:#000"
+                   oncanplay="document.getElementById('video-modal-spinner').style.display='none'"
+                   onwaiting="document.getElementById('video-modal-spinner').style.display='flex'"></video>
+        </div>
+    </div>
+</div>
+<style>
+#video-modal{opacity:0;pointer-events:none;transition:opacity .3s ease}
+#video-modal.open{opacity:1;pointer-events:all}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<!-- Photo Modal -->
+<div id="photo-modal" style="position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(20px)" onclick="closePhotoModal()"></div>
+    <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-width:min(92vw,1000px);max-height:92vh">
+        <!-- botão fechar -->
+        <button onclick="closePhotoModal()" style="position:absolute;top:-14px;right:-14px;z-index:2;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);transition:background .2s"
+                onmouseover="this.style.background='var(--pink)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
+            <i class="fas fa-times text-sm"></i>
+        </button>
+        <!-- spinner enquanto carrega -->
+        <div id="photo-modal-spinner" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1">
+            <div style="width:48px;height:48px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--pink);border-radius:50%;animation:spin .8s linear infinite"></div>
+        </div>
+        <!-- imagem -->
+        <img id="photo-modal-img" src="" alt=""
+             style="max-width:100%;max-height:calc(92vh - 56px);border-radius:14px;border:1px solid rgba(255,45,120,.2);object-fit:contain;transition:opacity .25s ease;box-shadow:0 24px 64px rgba(0,0,0,.5)">
+        <!-- rodapé -->
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px">
+            <p class="text-sm text-white truncate" id="photo-modal-title" style="flex:1;opacity:.8"></p>
+            <div style="display:flex;gap:8px;flex-shrink:0">
+                <a id="photo-modal-dl" href="#" download
+                   class="btn-ghost text-xs" style="padding:7px 14px">
+                    <i class="fas fa-download mr-1"></i> Baixar
+                </a>
+                <a id="photo-modal-link" href="#" target="_blank"
+                   class="btn-ghost text-xs" style="padding:7px 14px">
+                    <i class="fas fa-external-link-alt mr-1"></i> Drive
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+#photo-modal{opacity:0;pointer-events:none;transition:opacity .3s ease}
+#photo-modal.open{opacity:1;pointer-events:all}
+</style>
+
+<!-- Pack Preview Modal -->
+<div id="pack-modal">
+    <div id="pack-modal-backdrop"></div>
+    <div id="pack-modal-box">
+        <button class="modal-close-btn" id="pack-modal-close" aria-label="Fechar">
+            <i class="fas fa-times"></i>
+        </button>
+        <!-- Cover header -->
+        <div id="modal-pack-cover" class="relative overflow-hidden" style="height:150px;background:linear-gradient(135deg,#c0185a,#6d1580)">
+            <div class="absolute inset-0" style="background:linear-gradient(to top, rgba(0,0,0,.7) 0%, transparent 100%)"></div>
+            <div class="absolute bottom-0 left-0 right-0 p-5 flex items-end gap-3">
+                <div id="modal-pack-initial" class="pack-model-avatar flex-shrink-0" style="width:44px;height:44px;font-size:18px;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25)">S</div>
+                <div>
+                    <p class="text-xs font-medium mb-0.5" id="modal-pack-model" style="color:rgba(255,255,255,.6)">Sofia Melo</p>
+                    <h3 class="text-white font-bold text-xl leading-tight" id="modal-pack-title">Verão 2026</h3>
+                </div>
+            </div>
+        </div>
+        <!-- Body -->
+        <div class="p-5">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex gap-2 flex-wrap" id="modal-pack-tags"></div>
+                <span class="text-xs flex-shrink-0 ml-3" style="color:rgba(255,255,255,.45)" id="modal-pack-meta">15 arquivos · 2.4 GB</span>
+            </div>
+            <div class="divider"></div>
+            <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:rgba(255,255,255,.3)">Conteúdo do Pack</p>
+            <div id="modal-file-list" class="space-y-0.5 mb-5"></div>
+            <button id="modal-download-btn" class="btn-pink w-full flex items-center justify-center gap-2" style="padding:13px">
+                <i class="fas fa-download"></i> Baixar Pack Completo
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- App JS -->
+<script src="app.js"></script>
+</body>
+</html>

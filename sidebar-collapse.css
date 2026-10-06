@@ -1,0 +1,436 @@
+/* ══════════════════════════════════════════════════════════
+   HOTFY — COLLAPSIBLE SIDEBAR   ·   sidebar-collapse.css
+══════════════════════════════════════════════════════════ */
+
+/* ── Layout tokens ── */
+:root {
+    --sidebar-w:           252px;
+    --sidebar-w-collapsed: 72px;
+    --collapse-dur:        0.42s;
+    --collapse-ease:       cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR — animated width
+══════════════════════════════════════════ */
+.sidebar {
+    width:      var(--sidebar-w);
+    transition: width var(--collapse-dur) var(--collapse-ease),
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: width;
+}
+.sidebar.collapsed {
+    width:    var(--sidebar-w-collapsed);
+    overflow: visible; /* lets tooltips protrude to the right */
+}
+
+/* ══════════════════════════════════════════
+   MAIN CONTENT — tracks sidebar width
+══════════════════════════════════════════ */
+.main-content {
+    margin-left: var(--sidebar-w);
+    transition:  margin-left var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed ~ .main-content {
+    margin-left: var(--sidebar-w-collapsed);
+}
+
+/* ── Mobile: collapse mechanism disabled ── */
+@media (max-width: 768px) {
+    .sidebar,
+    .sidebar.collapsed       { width: var(--sidebar-w) !important; overflow: hidden !important; }
+    .main-content            { margin-left: 0 !important; transition: none !important; }
+    .sidebar-toggle-btn      { display: none !important; }
+    .nav-text, .nav-section-label, .nav-badge, .profile-text, .logo-text, .notif-dot { opacity: 1 !important; max-width: 200px !important; max-height: 40px !important; }
+}
+
+/* ══════════════════════════════════════════
+   TOGGLE BUTTON
+══════════════════════════════════════════ */
+.sidebar-toggle-btn {
+    width:           100%;
+    display:         flex;
+    align-items:     center;
+    gap:             10px;
+    padding:         9px 14px;
+    border-radius:   12px;
+    background:      rgba(255, 255, 255, 0.04);
+    border:          1px solid var(--border);
+    cursor:          pointer;
+    transition:
+        background    0.22s ease,
+        border-color  0.22s ease,
+        box-shadow    0.22s ease,
+        padding       var(--collapse-dur) var(--collapse-ease),
+        justify-content var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar-toggle-btn:hover {
+    background:   rgba(255, 45, 120, 0.10);
+    border-color: rgba(255, 45, 120, 0.32);
+    box-shadow:   0 0 14px rgba(255, 45, 120, 0.14);
+}
+.sidebar-toggle-btn:hover i { color: var(--pink) !important; }
+
+/* Chevron icon */
+.sidebar-toggle-btn i {
+    font-size:   12px;
+    color:       rgba(255, 255, 255, 0.42);
+    flex-shrink: 0;
+    transition:
+        transform 0.42s cubic-bezier(0.34, 1.2, 0.64, 1),
+        color     0.22s ease;
+}
+
+/* Rotate arrow when collapsed */
+.sidebar.collapsed .sidebar-toggle-btn i {
+    transform: rotate(180deg);
+    color:     rgba(255, 255, 255, 0.55);
+}
+
+/* Center icon when collapsed */
+.sidebar.collapsed .sidebar-toggle-btn {
+    justify-content: center;
+    padding:         9px 0;
+}
+
+/* ══════════════════════════════════════════
+   LOGO AREA
+══════════════════════════════════════════ */
+
+/* Flex wrapper around SVG + logo text */
+.sidebar-logo-wrap {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+    flex:        1;
+    min-width:   0;
+    overflow:    visible; /* was hidden — butterflyBreath scales the SVG, hidden clips it */
+    transition:  gap var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .sidebar-logo-wrap {
+    gap: 0;
+}
+
+/* Butterfly — stays always, slight spring pop when alone */
+.sidebar-butterfly {
+    flex-shrink: 0;
+    transition:  transform 0.45s cubic-bezier(0.34, 1.35, 0.64, 1);
+}
+.sidebar.collapsed .sidebar-butterfly {
+    transform: scale(1.06);
+}
+
+/* Logo header: reduce side padding so 40px SVG fits inside 72px sidebar */
+.sidebar.collapsed > div:first-child {
+    padding-left:  16px !important;
+    padding-right: 16px !important;
+}
+
+/* Logo text block */
+.logo-text {
+    flex:        1;
+    min-width:   0;
+    white-space: nowrap;
+    overflow:    hidden;
+    opacity:     1;
+    max-width:   190px;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.6) ease 0.06s,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .logo-text {
+    opacity:        0;
+    max-width:      0;
+    pointer-events: none;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.3) ease,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+
+/* ══════════════════════════════════════════
+   PROFILE MINI-CARD
+══════════════════════════════════════════ */
+.profile-card {
+    gap:         12px;
+    transition:
+        gap      var(--collapse-dur) var(--collapse-ease),
+        padding  var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .profile-card {
+    gap:             0;
+    justify-content: center;
+    padding:         8px !important;
+}
+
+/* Profile outer wrapper (mx-4): trim margins so avatar fits in 72px without padding war */
+.sidebar.collapsed .mx-4 {
+    margin-left:  6px !important;
+    margin-right: 6px !important;
+}
+
+/* Profile name + plan text */
+.profile-text {
+    flex:        1;
+    min-width:   0;
+    white-space: nowrap;
+    overflow:    hidden;
+    opacity:     1;
+    max-width:   160px;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.6) ease 0.04s,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .profile-text {
+    opacity:        0;
+    max-width:      0;
+    pointer-events: none;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.28) ease,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+
+/* Notification dot */
+.sidebar .notif-dot {
+    flex-shrink: 0;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.35) ease,
+        transform 0.30s cubic-bezier(0.34, 1.4, 0.64, 1),
+        width     var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .notif-dot {
+    opacity:        0;
+    transform:      scale(0.3);
+    width:          0;
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION ITEMS
+══════════════════════════════════════════ */
+
+/* Nav container: trim px-4 (16px each side) — gives icons more room in 72px sidebar */
+.sidebar.collapsed nav {
+    padding-left:  8px !important;
+    padding-right: 8px !important;
+}
+
+/* display:block + text-align:center is the most reliable centering for icon-only mode.
+   flex keeps introducing distribution-algorithm edge cases with the other spans present. */
+.sidebar.collapsed .nav-item {
+    display:    block;
+    text-align: center;
+    padding:    10px 0;
+    gap:        0;
+}
+
+/* Icon: inline-block so it participates in text-align:center;
+   font-size with !important protects against any inherited 0 from siblings. */
+.sidebar.collapsed .nav-item i {
+    display:   inline-block;
+    font-size: 16px !important;
+    width:     auto;
+}
+
+/* Active: swap pink→white to avoid camouflage on the pink-tinted background */
+.sidebar.collapsed .nav-item.active i {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Non-active: slightly brighter than the default 0.45 for better contrast when icon-only */
+.sidebar.collapsed .nav-item:not(.active) i {
+    color: rgba(255, 255, 255, 0.68);
+}
+
+/* Nav text spans */
+.nav-text {
+    /* flex:1 + min-width:0 lets it fill space in the expanded flex nav-item
+       and shrink with ellipsis when space is tight */
+    flex:          1;
+    min-width:     0;
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    opacity:       1;
+    max-width:     200px;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.55) ease 0.04s,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .nav-text {
+    /* font-size/line-height/height:0 eliminate this element's contribution to the
+       line-box height in the block-layout nav-item.
+       Without these, even a 0-width inline-block still occupies a full line of
+       vertical space, which was creating the large gaps between icons. */
+    opacity:     0;
+    max-width:   0;
+    min-width:   0;
+    width:       0;
+    height:      0;
+    font-size:   0;
+    line-height: 0;
+    overflow:    hidden;
+    pointer-events: none;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.28) ease,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+
+/* Section labels — "Menu", "Conta" */
+.nav-section-label {
+    white-space: nowrap;
+    overflow:    hidden;
+    opacity:     1;
+    max-height:  24px;
+    transition:
+        opacity    calc(var(--collapse-dur) * 0.45) ease,
+        max-height var(--collapse-dur) var(--collapse-ease),
+        margin     var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .nav-section-label {
+    opacity:        0;
+    max-height:     0;
+    margin-top:     0 !important;
+    margin-bottom:  0 !important;
+    pointer-events: none;
+    transition:
+        opacity    calc(var(--collapse-dur) * 0.22) ease,
+        max-height var(--collapse-dur) var(--collapse-ease),
+        margin     var(--collapse-dur) var(--collapse-ease);
+}
+
+/* Divider */
+.divider {
+    transition:
+        opacity var(--collapse-dur) ease,
+        margin  var(--collapse-dur) var(--collapse-ease);
+}
+.sidebar.collapsed .divider {
+    opacity:  0;
+    height:   0;         /* height:1px still took space even at opacity:0 */
+    margin:   0 !important;
+    overflow: hidden;
+}
+
+/* Counter / badge spans ("12", "Novo") */
+.nav-badge {
+    flex-shrink: 0;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.42) ease,
+        transform 0.28s cubic-bezier(0.34, 1.4, 0.64, 1),
+        max-width var(--collapse-dur) var(--collapse-ease);
+    overflow:    hidden;
+}
+.sidebar.collapsed .nav-badge {
+    opacity:        0;
+    transform:      scale(0.5);
+    min-width:      0;
+    max-width:      0;
+    width:          0;
+    height:         0;
+    font-size:      0;
+    line-height:    0;
+    padding:        0 !important;
+    margin:         0 !important;
+    pointer-events: none;
+    overflow:       hidden;
+    transition:
+        opacity   calc(var(--collapse-dur) * 0.22) ease,
+        transform 0.22s ease,
+        max-width var(--collapse-dur) var(--collapse-ease);
+}
+
+/* Logout button keeps flex (it's a <button>, not a nav link), but
+   remove all spacing so the icon centers naturally */
+.sidebar.collapsed #btn-logout {
+    justify-content: center !important;
+    padding-left:    0 !important;
+    padding-right:   0 !important;
+    gap:             0 !important;
+}
+/* Logout icon */
+.sidebar.collapsed #btn-logout i {
+    flex-shrink: 0;
+    width:       auto;
+    font-size:   16px;
+    color:       rgba(255, 80, 80, 0.85); /* keep its red tint */
+}
+
+/* ══════════════════════════════════════════
+   TOOLTIPS
+   Only visible when sidebar is collapsed.
+══════════════════════════════════════════ */
+.nav-tooltip {
+    /* Position: right of the nav item */
+    position:   absolute;
+    left:       calc(100% + 14px);
+    top:        50%;
+    transform:  translateY(-50%) translateX(-8px);
+
+    /* Visuals */
+    background:      rgba(10, 10, 16, 0.97);
+    border:          1px solid rgba(255, 45, 120, 0.30);
+    border-radius:   10px;
+    padding:         7px 14px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+        0  4px 22px rgba(0, 0, 0, 0.60),
+        0  0   0   1px rgba(255, 45, 120, 0.08);
+
+    /* Typography */
+    color:       rgba(255, 255, 255, 0.92);
+    font-size:   12px;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    white-space: nowrap;
+
+    /* Invisible by default */
+    opacity:        0;
+    pointer-events: none;
+    z-index:        200;
+
+    /* Entrance spring */
+    transition:
+        opacity   0.18s ease,
+        transform 0.22s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* Left arrow — outline */
+.nav-tooltip::before {
+    content:   '';
+    position:  absolute;
+    right:     100%;
+    top:       50%;
+    transform: translateY(-50%);
+    border:    5px solid transparent;
+    border-right-color: rgba(255, 45, 120, 0.38);
+}
+/* Left arrow — fill (creates double-border effect) */
+.nav-tooltip::after {
+    content:   '';
+    position:  absolute;
+    right:     calc(100% - 1px);
+    top:       50%;
+    transform: translateY(-50%);
+    border:    5px solid transparent;
+    border-right-color: rgba(10, 10, 16, 0.97);
+}
+
+/* Show ONLY when sidebar is collapsed + hovering */
+.sidebar.collapsed .nav-item:hover .nav-tooltip,
+.sidebar.collapsed #btn-logout:hover .nav-tooltip,
+.sidebar.collapsed .sidebar-toggle-btn:hover .nav-tooltip {
+    opacity:   1;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Never show when sidebar is open */
+.sidebar:not(.collapsed) .nav-tooltip {
+    display: none;
+}
+
+/* Accent color for active nav item tooltip */
+.sidebar.collapsed .nav-item.active .nav-tooltip {
+    border-color: rgba(255, 45, 120, 0.52);
+    color:        #ffaac8;
+}
